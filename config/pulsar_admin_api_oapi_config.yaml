@@ -1,0 +1,10 @@
+package: pulsaradmin
+generate:
+  models: true
+  client: true
+# import-mapping:
+#   ./packageA/spec.yaml: github.com/deepmap/oapi-codegen/internal/test/externalref/packageA
+#   ./packageB/spec.yaml: github.com/deepmap/oapi-codegen/internal/test/externalref/packageB
+output: src/pulsaradmin/pulsaradmin.gen.go
+output-options:
+  skip-prune: true
