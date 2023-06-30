@@ -67,9 +67,8 @@ Example program to get list of topics in a namespace
 
 3. Convert the swagger spec to openapi
 
-   TODO: this step should be automated in the future, for now use https://editor-next.swagger.io/
-   to convert the swagger json to openapi 3.0 json and then to openapi yaml.
-   Save the resulting file to `specs/pulsar_admin_api_openapi_spec.yaml`.
+       make openapi-json
+       make openapi-yaml
 
 4. Generate the client code
 
