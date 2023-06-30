@@ -78,9 +78,6 @@ func main() {
 			inExpireMessageEndpoint = expireMessagesTimeEndpointRegex.Match(nextLine)
 			inSchemaByVersionEndpoint = regexSchemasWithVersionEndpoint.Match(nextLine)
 			inBrokersByClusterEndpoint = regexBrokersByClusterEndpoint.Match(nextLine)
-			if regexBrokersByClusterEndpoint.Match(nextLine) {
-				fmt.Println("found it")
-			}
 		}
 
 		nextLineOut := string(nextLine)
@@ -95,7 +92,6 @@ func main() {
 				nextLineOut = strings.Replace(nextLineOut, "SchemasResource_getSchema", "SchemasResource_getSchemaByVersion", 1)
 			}
 			if inBrokersByClusterEndpoint {
-				fmt.Println(nextLineOut)
 				nextLineOut = strings.Replace(nextLineOut, "BrokersBase_getActiveBrokers", "BrokersBase_getActiveBrokersByCluster", 1)
 			}
 		}
