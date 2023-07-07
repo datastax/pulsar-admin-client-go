@@ -2,7 +2,6 @@
 
 PULSAR_API_SPEC_VERSION ?= 3.0.0
 PULSAR_SWAGGER_SPEC_BASE_URL ?= https://pulsar.apache.org/swagger/$(PULSAR_API_SPEC_VERSION)/
-OPENAPI_CONVERTER_URL ?= https://converter.swagger.io/convert
 
 pulsar_admin_api_swagger_spec_original_file = specs/pulsar_admin_api_swagger_original.json
 pulsar_admin_api_swagger_spec_modified_file = specs/pulsar_admin_api_swagger_revised.json
