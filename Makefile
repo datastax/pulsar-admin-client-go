@@ -3,7 +3,7 @@
 PULSAR_API_SPEC_VERSION ?= 3.0.11
 PULSAR_SWAGGER_SPEC_BASE_URL ?= https://pulsar.apache.org/swagger/$(PULSAR_API_SPEC_VERSION)/
 
-OAPI_CODEGEN_VERSION = v1.15
+OAPI_CODEGEN_VERSION = v2.4.1
 
 pulsar_admin_api_swagger_spec_original_file = specs/pulsar_admin_api_swagger_original.json
 pulsar_admin_api_swagger_spec_modified_file = specs/pulsar_admin_api_swagger_revised.json
@@ -28,7 +28,7 @@ yq:
 	@type yq >/dev/null 2>&1 || echo "`yq` command not found in PATH, please install curl before continuing"
 
 oapi-codegen:
-	@type oapi-codegen >/dev/null 2>&1 || go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@$(OAPI_CODEGEN_VERSION)
+	@type oapi-codegen >/dev/null 2>&1 || go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@$(OAPI_CODEGEN_VERSION)
 
 download-specs: curl
 	curl $(PULSAR_SWAGGER_SPEC_BASE_URL)/swagger.json -o "$(pulsar_admin_api_swagger_spec_original_file)"
@@ -52,5 +52,3 @@ build:
 	go build ./...
 
 .PHONY: convert-spec-openapi curl download-pulsar-specs generate generate-pulsar-admin-api-client openapi-yaml revise-specs
-
-
