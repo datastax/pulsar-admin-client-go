@@ -98,10 +98,17 @@ const (
 
 // Defines values for LongRunningProcessStatusStatus.
 const (
-	ERROR   LongRunningProcessStatusStatus = "ERROR"
-	NOTRUN  LongRunningProcessStatusStatus = "NOT_RUN"
-	RUNNING LongRunningProcessStatusStatus = "RUNNING"
-	SUCCESS LongRunningProcessStatusStatus = "SUCCESS"
+	LongRunningProcessStatusStatusERROR   LongRunningProcessStatusStatus = "ERROR"
+	LongRunningProcessStatusStatusNOTRUN  LongRunningProcessStatusStatus = "NOT_RUN"
+	LongRunningProcessStatusStatusRUNNING LongRunningProcessStatusStatus = "RUNNING"
+	LongRunningProcessStatusStatusSUCCESS LongRunningProcessStatusStatus = "SUCCESS"
+)
+
+// Defines values for NamespaceIsolationDataUnloadScope.
+const (
+	NamespaceIsolationDataUnloadScopeAllMatching NamespaceIsolationDataUnloadScope = "all_matching"
+	NamespaceIsolationDataUnloadScopeChanged     NamespaceIsolationDataUnloadScope = "changed"
+	NamespaceIsolationDataUnloadScopeNone        NamespaceIsolationDataUnloadScope = "none"
 )
 
 // Defines values for NamespaceOwnershipStatusBrokerAssignment.
@@ -131,6 +138,14 @@ const (
 	OffloadPoliciesImplManagedLedgerOffloadedReadPriorityTIEREDSTORAGEFIRST OffloadPoliciesImplManagedLedgerOffloadedReadPriority = "TIERED_STORAGE_FIRST"
 )
 
+// Defines values for OffloadProcessStatusStatus.
+const (
+	OffloadProcessStatusStatusERROR   OffloadProcessStatusStatus = "ERROR"
+	OffloadProcessStatusStatusNOTRUN  OffloadProcessStatusStatus = "NOT_RUN"
+	OffloadProcessStatusStatusRUNNING OffloadProcessStatusStatus = "RUNNING"
+	OffloadProcessStatusStatusSUCCESS OffloadProcessStatusStatus = "SUCCESS"
+)
+
 // Defines values for PoliciesSchemaAutoUpdateCompatibilityStrategy.
 const (
 	AlwaysCompatible   PoliciesSchemaAutoUpdateCompatibilityStrategy = "AlwaysCompatible"
@@ -158,8 +173,8 @@ const (
 
 // Defines values for PoliciesSubscriptionAuthMode.
 const (
-	None   PoliciesSubscriptionAuthMode = "None"
-	Prefix PoliciesSubscriptionAuthMode = "Prefix"
+	PoliciesSubscriptionAuthModeNone   PoliciesSubscriptionAuthMode = "None"
+	PoliciesSubscriptionAuthModePrefix PoliciesSubscriptionAuthMode = "Prefix"
 )
 
 // Defines values for PublisherStatsAccessMode.
@@ -309,6 +324,13 @@ type AutoTopicCreationOverride struct {
 	TopicType              *string `json:"topicType,omitempty"`
 }
 
+// AutoTopicCreationOverrideImpl defines model for AutoTopicCreationOverrideImpl.
+type AutoTopicCreationOverrideImpl struct {
+	AllowAutoTopicCreation *bool   `json:"allowAutoTopicCreation,omitempty"`
+	DefaultNumPartitions   *int32  `json:"defaultNumPartitions,omitempty"`
+	TopicType              *string `json:"topicType,omitempty"`
+}
+
 // BacklogQuota defines model for BacklogQuota.
 type BacklogQuota struct {
 	Limit     *int64              `json:"limit,omitempty"`
@@ -331,8 +353,19 @@ type BacklogQuotaImpl struct {
 // BacklogQuotaImplPolicy defines model for BacklogQuotaImpl.Policy.
 type BacklogQuotaImplPolicy string
 
+// BitSet defines model for BitSet.
+type BitSet struct {
+	Empty *bool `json:"empty,omitempty"`
+}
+
 // BookieAffinityGroupData defines model for BookieAffinityGroupData.
 type BookieAffinityGroupData struct {
+	BookkeeperAffinityGroupPrimary   *string `json:"bookkeeperAffinityGroupPrimary,omitempty"`
+	BookkeeperAffinityGroupSecondary *string `json:"bookkeeperAffinityGroupSecondary,omitempty"`
+}
+
+// BookieAffinityGroupDataImpl defines model for BookieAffinityGroupDataImpl.
+type BookieAffinityGroupDataImpl struct {
 	BookkeeperAffinityGroupPrimary   *string `json:"bookkeeperAffinityGroupPrimary,omitempty"`
 	BookkeeperAffinityGroupSecondary *string `json:"bookkeeperAffinityGroupSecondary,omitempty"`
 }
@@ -350,6 +383,7 @@ type BookiesClusterInfo struct {
 
 // BrokerInfo defines model for BrokerInfo.
 type BrokerInfo struct {
+	BrokerId   *string `json:"brokerId,omitempty"`
 	ServiceUrl *string `json:"serviceUrl,omitempty"`
 }
 
@@ -368,6 +402,12 @@ type BrokerNamespaceIsolationData struct {
 
 // BundlesData defines model for BundlesData.
 type BundlesData struct {
+	Boundaries *[]string `json:"boundaries,omitempty"`
+	NumBundles *int32    `json:"numBundles,omitempty"`
+}
+
+// BundlesDataImpl defines model for BundlesDataImpl.
+type BundlesDataImpl struct {
 	Boundaries *[]string `json:"boundaries,omitempty"`
 	NumBundles *int32    `json:"numBundles,omitempty"`
 }
@@ -795,12 +835,12 @@ type LedgerDetails struct {
 
 // LedgerInfo defines model for LedgerInfo.
 type LedgerInfo struct {
-	Entries         *int64  `json:"entries,omitempty"`
-	LedgerId        *int64  `json:"ledgerId,omitempty"`
-	Metadata        *string `json:"metadata,omitempty"`
-	Offloaded       *bool   `json:"offloaded,omitempty"`
-	Size            *int64  `json:"size,omitempty"`
-	UnderReplicated *bool   `json:"underReplicated,omitempty"`
+	Entries              *int64  `json:"entries,omitempty"`
+	IsOffloaded          *bool   `json:"isOffloaded,omitempty"`
+	LedgerId             *int64  `json:"ledgerId,omitempty"`
+	OffloadedContextUuid *string `json:"offloadedContextUuid,omitempty"`
+	Size                 *int64  `json:"size,omitempty"`
+	Timestamp            *int64  `json:"timestamp,omitempty"`
 }
 
 // LoadReport defines model for LoadReport.
@@ -883,6 +923,20 @@ type MemoryLimit struct {
 	PercentOfMaxDirectMemory *float64 `json:"percentOfMaxDirectMemory,omitempty"`
 }
 
+// MessageId defines model for MessageId.
+type MessageId = map[string]interface{}
+
+// MessageIdAdv defines model for MessageIdAdv.
+type MessageIdAdv struct {
+	AckSet              *BitSet       `json:"ackSet,omitempty"`
+	BatchIndex          *int32        `json:"batchIndex,omitempty"`
+	BatchSize           *int32        `json:"batchSize,omitempty"`
+	EntryId             *int64        `json:"entryId,omitempty"`
+	FirstChunkMessageId *MessageIdAdv `json:"firstChunkMessageId,omitempty"`
+	LedgerId            *int64        `json:"ledgerId,omitempty"`
+	PartitionIndex      *int32        `json:"partitionIndex,omitempty"`
+}
+
 // MessageRangeInfo defines model for MessageRangeInfo.
 type MessageRangeInfo struct {
 	From *PositionInfo `json:"from,omitempty"`
@@ -919,7 +973,13 @@ type NamespaceIsolationData struct {
 
 	// Secondary The list of secondary brokers for serving the list of namespaces in this isolation policy
 	Secondary *[]string `json:"secondary,omitempty"`
+
+	// UnloadScope The type of unload to perform while applying the new isolation policy.
+	UnloadScope *NamespaceIsolationDataUnloadScope `json:"unload_scope,omitempty"`
 }
+
+// NamespaceIsolationDataUnloadScope The type of unload to perform while applying the new isolation policy.
+type NamespaceIsolationDataUnloadScope string
 
 // NamespaceOwnershipStatus defines model for NamespaceOwnershipStatus.
 type NamespaceOwnershipStatus struct {
@@ -935,6 +995,8 @@ type NamespaceOwnershipStatusBrokerAssignment string
 type NonPersistentPartitionedTopicStatsImpl struct {
 	AbortedTxnCount                                  *int64                                     `json:"abortedTxnCount,omitempty"`
 	AverageMsgSize                                   *float64                                   `json:"averageMsgSize,omitempty"`
+	BacklogQuotaLimitSize                            *int64                                     `json:"backlogQuotaLimitSize,omitempty"`
+	BacklogQuotaLimitTime                            *int64                                     `json:"backlogQuotaLimitTime,omitempty"`
 	BacklogSize                                      *int64                                     `json:"backlogSize,omitempty"`
 	BytesInCounter                                   *int64                                     `json:"bytesInCounter,omitempty"`
 	BytesOutCounter                                  *int64                                     `json:"bytesOutCounter,omitempty"`
@@ -958,6 +1020,8 @@ type NonPersistentPartitionedTopicStatsImpl struct {
 	NonContiguousDeletedMessagesRanges               *int32                                     `json:"nonContiguousDeletedMessagesRanges,omitempty"`
 	NonContiguousDeletedMessagesRangesSerializedSize *int32                                     `json:"nonContiguousDeletedMessagesRangesSerializedSize,omitempty"`
 	OffloadedStorageSize                             *int64                                     `json:"offloadedStorageSize,omitempty"`
+	OldestBacklogMessageAgeSeconds                   *int64                                     `json:"oldestBacklogMessageAgeSeconds,omitempty"`
+	OldestBacklogMessageSubscriptionName             *string                                    `json:"oldestBacklogMessageSubscriptionName,omitempty"`
 	OngoingTxnCount                                  *int64                                     `json:"ongoingTxnCount,omitempty"`
 	OwnerBroker                                      *string                                    `json:"ownerBroker,omitempty"`
 	Partitions                                       *map[string]NonPersistentTopicStatsImpl    `json:"partitions,omitempty"`
@@ -1035,6 +1099,7 @@ type NonPersistentSubscriptionStats struct {
 	MsgBacklogNoDelayed                              *int64             `json:"msgBacklogNoDelayed,omitempty"`
 	MsgDelayed                                       *int64             `json:"msgDelayed,omitempty"`
 	MsgDropRate                                      *float64           `json:"msgDropRate,omitempty"`
+	MsgInReplay                                      *int64             `json:"msgInReplay,omitempty"`
 	MsgOutCounter                                    *int64             `json:"msgOutCounter,omitempty"`
 	MsgRateExpired                                   *float64           `json:"msgRateExpired,omitempty"`
 	MsgRateOut                                       *float64           `json:"msgRateOut,omitempty"`
@@ -1053,6 +1118,8 @@ type NonPersistentSubscriptionStats struct {
 type NonPersistentTopicStatsImpl struct {
 	AbortedTxnCount                                  *int64                                     `json:"abortedTxnCount,omitempty"`
 	AverageMsgSize                                   *float64                                   `json:"averageMsgSize,omitempty"`
+	BacklogQuotaLimitSize                            *int64                                     `json:"backlogQuotaLimitSize,omitempty"`
+	BacklogQuotaLimitTime                            *int64                                     `json:"backlogQuotaLimitTime,omitempty"`
 	BacklogSize                                      *int64                                     `json:"backlogSize,omitempty"`
 	BytesInCounter                                   *int64                                     `json:"bytesInCounter,omitempty"`
 	BytesOutCounter                                  *int64                                     `json:"bytesOutCounter,omitempty"`
@@ -1075,6 +1142,8 @@ type NonPersistentTopicStatsImpl struct {
 	NonContiguousDeletedMessagesRanges               *int32                                     `json:"nonContiguousDeletedMessagesRanges,omitempty"`
 	NonContiguousDeletedMessagesRangesSerializedSize *int32                                     `json:"nonContiguousDeletedMessagesRangesSerializedSize,omitempty"`
 	OffloadedStorageSize                             *int64                                     `json:"offloadedStorageSize,omitempty"`
+	OldestBacklogMessageAgeSeconds                   *int64                                     `json:"oldestBacklogMessageAgeSeconds,omitempty"`
+	OldestBacklogMessageSubscriptionName             *string                                    `json:"oldestBacklogMessageSubscriptionName,omitempty"`
 	OngoingTxnCount                                  *int64                                     `json:"ongoingTxnCount,omitempty"`
 	OwnerBroker                                      *string                                    `json:"ownerBroker,omitempty"`
 	PublishRateLimitedTimes                          *int64                                     `json:"publishRateLimitedTimes,omitempty"`
@@ -1133,6 +1202,7 @@ type OffloadPoliciesImpl struct {
 	GcsManagedLedgerOffloadReadBufferSizeInBytes *int32                                                 `json:"gcsManagedLedgerOffloadReadBufferSizeInBytes,omitempty"`
 	GcsManagedLedgerOffloadRegion                *string                                                `json:"gcsManagedLedgerOffloadRegion,omitempty"`
 	GcsManagedLedgerOffloadServiceAccountKeyFile *string                                                `json:"gcsManagedLedgerOffloadServiceAccountKeyFile,omitempty"`
+	ManagedLedgerExtraConfigurations             *map[string]string                                     `json:"managedLedgerExtraConfigurations,omitempty"`
 	ManagedLedgerOffloadBucket                   *string                                                `json:"managedLedgerOffloadBucket,omitempty"`
 	ManagedLedgerOffloadDeletionLagInMillis      *int64                                                 `json:"managedLedgerOffloadDeletionLagInMillis,omitempty"`
 	ManagedLedgerOffloadDriver                   *string                                                `json:"managedLedgerOffloadDriver,omitempty"`
@@ -1160,6 +1230,16 @@ type OffloadPoliciesImpl struct {
 
 // OffloadPoliciesImplManagedLedgerOffloadedReadPriority defines model for OffloadPoliciesImpl.ManagedLedgerOffloadedReadPriority.
 type OffloadPoliciesImplManagedLedgerOffloadedReadPriority string
+
+// OffloadProcessStatus defines model for OffloadProcessStatus.
+type OffloadProcessStatus struct {
+	FirstUnoffloadedMessage *MessageId                  `json:"firstUnoffloadedMessage,omitempty"`
+	LastError               *string                     `json:"lastError,omitempty"`
+	Status                  *OffloadProcessStatusStatus `json:"status,omitempty"`
+}
+
+// OffloadProcessStatusStatus defines model for OffloadProcessStatus.Status.
+type OffloadProcessStatusStatus string
 
 // OutputStream defines model for OutputStream.
 type OutputStream = map[string]interface{}
@@ -1193,6 +1273,8 @@ type PartitionedTopicMetadata struct {
 type PartitionedTopicStatsImpl struct {
 	AbortedTxnCount                                  *int64                        `json:"abortedTxnCount,omitempty"`
 	AverageMsgSize                                   *float64                      `json:"averageMsgSize,omitempty"`
+	BacklogQuotaLimitSize                            *int64                        `json:"backlogQuotaLimitSize,omitempty"`
+	BacklogQuotaLimitTime                            *int64                        `json:"backlogQuotaLimitTime,omitempty"`
 	BacklogSize                                      *int64                        `json:"backlogSize,omitempty"`
 	BytesInCounter                                   *int64                        `json:"bytesInCounter,omitempty"`
 	BytesOutCounter                                  *int64                        `json:"bytesOutCounter,omitempty"`
@@ -1215,6 +1297,8 @@ type PartitionedTopicStatsImpl struct {
 	NonContiguousDeletedMessagesRanges               *int32                        `json:"nonContiguousDeletedMessagesRanges,omitempty"`
 	NonContiguousDeletedMessagesRangesSerializedSize *int32                        `json:"nonContiguousDeletedMessagesRangesSerializedSize,omitempty"`
 	OffloadedStorageSize                             *int64                        `json:"offloadedStorageSize,omitempty"`
+	OldestBacklogMessageAgeSeconds                   *int64                        `json:"oldestBacklogMessageAgeSeconds,omitempty"`
+	OldestBacklogMessageSubscriptionName             *string                       `json:"oldestBacklogMessageSubscriptionName,omitempty"`
 	OngoingTxnCount                                  *int64                        `json:"ongoingTxnCount,omitempty"`
 	OwnerBroker                                      *string                       `json:"ownerBroker,omitempty"`
 	Partitions                                       *map[string]TopicStats        `json:"partitions,omitempty"`
@@ -1281,6 +1365,8 @@ type PersistentTopicInternalStats struct {
 // PersistentTopicStats defines model for PersistentTopicStats.
 type PersistentTopicStats struct {
 	AverageMsgSize                                   *float64                      `json:"averageMsgSize,omitempty"`
+	BacklogQuotaLimitSize                            *int64                        `json:"backlogQuotaLimitSize,omitempty"`
+	BacklogQuotaLimitTime                            *int64                        `json:"backlogQuotaLimitTime,omitempty"`
 	BacklogSize                                      *int64                        `json:"backlogSize,omitempty"`
 	BytesInCounter                                   *int64                        `json:"bytesInCounter,omitempty"`
 	BytesOutCounter                                  *int64                        `json:"bytesOutCounter,omitempty"`
@@ -1298,6 +1384,8 @@ type PersistentTopicStats struct {
 	NonContiguousDeletedMessagesRanges               *int32                        `json:"nonContiguousDeletedMessagesRanges,omitempty"`
 	NonContiguousDeletedMessagesRangesSerializedSize *int32                        `json:"nonContiguousDeletedMessagesRangesSerializedSize,omitempty"`
 	OffloadedStorageSize                             *int64                        `json:"offloadedStorageSize,omitempty"`
+	OldestBacklogMessageAgeSeconds                   *int64                        `json:"oldestBacklogMessageAgeSeconds,omitempty"`
+	OldestBacklogMessageSubscriptionName             *string                       `json:"oldestBacklogMessageSubscriptionName,omitempty"`
 	OwnerBroker                                      *string                       `json:"ownerBroker,omitempty"`
 	Publishers                                       *[]PublisherStats             `json:"publishers,omitempty"`
 	Replication                                      *map[string]ReplicatorStats   `json:"replication,omitempty"`
@@ -1309,6 +1397,7 @@ type PersistentTopicStats struct {
 
 // Policies defines model for Policies.
 type Policies struct {
+	AllowedClusters                       *[]string                                      `json:"allowed_clusters,omitempty"`
 	AuthPolicies                          *AuthPolicies                                  `json:"auth_policies,omitempty"`
 	AutoSubscriptionCreationOverride      *AutoSubscriptionCreationOverride              `json:"autoSubscriptionCreationOverride,omitempty"`
 	AutoTopicCreationOverride             *AutoTopicCreationOverride                     `json:"autoTopicCreationOverride,omitempty"`
@@ -1607,6 +1696,7 @@ type SubscriptionStats struct {
 	MsgBacklog                                       *int64             `json:"msgBacklog,omitempty"`
 	MsgBacklogNoDelayed                              *int64             `json:"msgBacklogNoDelayed,omitempty"`
 	MsgDelayed                                       *int64             `json:"msgDelayed,omitempty"`
+	MsgInReplay                                      *int64             `json:"msgInReplay,omitempty"`
 	MsgOutCounter                                    *int64             `json:"msgOutCounter,omitempty"`
 	MsgRateExpired                                   *float64           `json:"msgRateExpired,omitempty"`
 	MsgRateOut                                       *float64           `json:"msgRateOut,omitempty"`
@@ -1645,9 +1735,18 @@ type ThreadContainerFactory struct {
 	ThreadGroupName         *string      `json:"threadGroupName,omitempty"`
 }
 
+// TopicHashPositions defines model for TopicHashPositions.
+type TopicHashPositions struct {
+	Bundle             *string           `json:"bundle,omitempty"`
+	Namespace          *string           `json:"namespace,omitempty"`
+	TopicHashPositions *map[string]int64 `json:"topicHashPositions,omitempty"`
+}
+
 // TopicStats defines model for TopicStats.
 type TopicStats struct {
 	AverageMsgSize                                   *float64                      `json:"averageMsgSize,omitempty"`
+	BacklogQuotaLimitSize                            *int64                        `json:"backlogQuotaLimitSize,omitempty"`
+	BacklogQuotaLimitTime                            *int64                        `json:"backlogQuotaLimitTime,omitempty"`
 	BacklogSize                                      *int64                        `json:"backlogSize,omitempty"`
 	BytesInCounter                                   *int64                        `json:"bytesInCounter,omitempty"`
 	BytesOutCounter                                  *int64                        `json:"bytesOutCounter,omitempty"`
@@ -1665,6 +1764,8 @@ type TopicStats struct {
 	NonContiguousDeletedMessagesRanges               *int32                        `json:"nonContiguousDeletedMessagesRanges,omitempty"`
 	NonContiguousDeletedMessagesRangesSerializedSize *int32                        `json:"nonContiguousDeletedMessagesRangesSerializedSize,omitempty"`
 	OffloadedStorageSize                             *int64                        `json:"offloadedStorageSize,omitempty"`
+	OldestBacklogMessageAgeSeconds                   *int64                        `json:"oldestBacklogMessageAgeSeconds,omitempty"`
+	OldestBacklogMessageSubscriptionName             *string                       `json:"oldestBacklogMessageSubscriptionName,omitempty"`
 	OwnerBroker                                      *string                       `json:"ownerBroker,omitempty"`
 	Publishers                                       *[]PublisherStats             `json:"publishers,omitempty"`
 	Replication                                      *map[string]ReplicatorStats   `json:"replication,omitempty"`
@@ -1676,6 +1777,8 @@ type TopicStats struct {
 
 // WorkerConfig defines model for WorkerConfig.
 type WorkerConfig struct {
+	AdditionalEnabledConnectorUrlPatterns        *[]string                          `json:"additionalEnabledConnectorUrlPatterns,omitempty"`
+	AdditionalEnabledFunctionsUrlPatterns        *[]string                          `json:"additionalEnabledFunctionsUrlPatterns,omitempty"`
 	AdditionalJavaRuntimeArguments               *[]string                          `json:"additionalJavaRuntimeArguments,omitempty"`
 	AssignmentWriteMaxRetries                    *int32                             `json:"assignmentWriteMaxRetries,omitempty"`
 	AuthenticateMetricsEndpoint                  *bool                              `json:"authenticateMetricsEndpoint,omitempty"`
@@ -1698,6 +1801,10 @@ type WorkerConfig struct {
 	ConfigurationStoreServers                    *string                            `json:"configurationStoreServers,omitempty"`
 	ConnectorsDirectory                          *string                            `json:"connectorsDirectory,omitempty"`
 	DownloadDirectory                            *string                            `json:"downloadDirectory,omitempty"`
+	EnableClassloadingOfBuiltinFiles             *bool                              `json:"enableClassloadingOfBuiltinFiles,omitempty"`
+	EnableClassloadingOfExternalFiles            *bool                              `json:"enableClassloadingOfExternalFiles,omitempty"`
+	EnableReferencingConnectorDirectoryFiles     *bool                              `json:"enableReferencingConnectorDirectoryFiles,omitempty"`
+	EnableReferencingFunctionsDirectoryFiles     *bool                              `json:"enableReferencingFunctionsDirectoryFiles,omitempty"`
 	ExposeAdminClientEnabled                     *bool                              `json:"exposeAdminClientEnabled,omitempty"`
 	FailureCheckFreqMs                           *int64                             `json:"failureCheckFreqMs,omitempty"`
 	ForwardSourceMessageProperty                 *bool                              `json:"forwardSourceMessageProperty,omitempty"`
@@ -1721,7 +1828,6 @@ type WorkerConfig struct {
 	HttpRequestsMaxPerSecond                     *float64                           `json:"httpRequestsMaxPerSecond,omitempty"`
 	HttpServerAcceptQueueSize                    *int32                             `json:"httpServerAcceptQueueSize,omitempty"`
 	HttpServerThreadPoolQueueSize                *int32                             `json:"httpServerThreadPoolQueueSize,omitempty"`
-	IgnoreUnknownConfigFields                    *bool                              `json:"ignoreUnknownConfigFields,omitempty"`
 	IncludeStandardPrometheusMetrics             *bool                              `json:"includeStandardPrometheusMetrics,omitempty"`
 	InitialBrokerReconnectMaxRetries             *int32                             `json:"initialBrokerReconnectMaxRetries,omitempty"`
 	InitializedDlogMetadata                      *bool                              `json:"initializedDlogMetadata,omitempty"`
@@ -1782,8 +1888,11 @@ type WorkerConfig struct {
 	UseCompactedMetadataTopic                    *bool                              `json:"useCompactedMetadataTopic,omitempty"`
 	UseTls                                       *bool                              `json:"useTls,omitempty"`
 	ValidateConnectorConfig                      *bool                              `json:"validateConnectorConfig,omitempty"`
+	WebServiceHaProxyProtocolEnabled             *bool                              `json:"webServiceHaProxyProtocolEnabled,omitempty"`
+	WebServiceLogDetailedAddresses               *bool                              `json:"webServiceLogDetailedAddresses,omitempty"`
 	WebServiceTlsCiphers                         *[]string                          `json:"webServiceTlsCiphers,omitempty"`
 	WebServiceTlsProtocols                       *[]string                          `json:"webServiceTlsProtocols,omitempty"`
+	WebServiceTrustXForwardedFor                 *bool                              `json:"webServiceTrustXForwardedFor,omitempty"`
 	WorkerHostname                               *string                            `json:"workerHostname,omitempty"`
 	WorkerId                                     *string                            `json:"workerId,omitempty"`
 	WorkerListProbeIntervalSec                   *int32                             `json:"workerListProbeIntervalSec,omitempty"`
@@ -1829,11 +1938,13 @@ type WorkersWorkerService = map[string]interface{}
 
 // BookiesUpdateBookieRackInfoParams defines parameters for BookiesUpdateBookieRackInfo.
 type BookiesUpdateBookieRackInfoParams struct {
-	Group *string `form:"group,omitempty" json:"group,omitempty"`
+	// Group The group
+	Group string `form:"group" json:"group"`
 }
 
 // BrokersBaseHealthCheckParams defines parameters for BrokersBaseHealthCheck.
 type BrokersBaseHealthCheckParams struct {
+	// TopicVersion Topic Version
 	TopicVersion *BrokersBaseHealthCheckParamsTopicVersion `form:"topicVersion,omitempty" json:"topicVersion,omitempty"`
 }
 
@@ -1863,6 +1974,9 @@ type NamespacesDeleteNamespaceParams struct {
 	Force         *bool `form:"force,omitempty" json:"force,omitempty"`
 	Authoritative *bool `form:"authoritative,omitempty" json:"authoritative,omitempty"`
 }
+
+// NamespacesSetNamespaceAllowedClustersJSONBody defines parameters for NamespacesSetNamespaceAllowedClusters.
+type NamespacesSetNamespaceAllowedClustersJSONBody = []string
 
 // NamespacesSetNamespaceAntiAffinityGroupJSONBody defines parameters for NamespacesSetNamespaceAntiAffinityGroup.
 type NamespacesSetNamespaceAntiAffinityGroupJSONBody = string
@@ -4178,6 +4292,9 @@ type WorkerDrainAtLeaderParams struct {
 // NamespacesCreateNamespaceJSONRequestBody defines body for NamespacesCreateNamespace for application/json ContentType.
 type NamespacesCreateNamespaceJSONRequestBody = Policies
 
+// NamespacesSetNamespaceAllowedClustersJSONRequestBody defines body for NamespacesSetNamespaceAllowedClusters for application/json ContentType.
+type NamespacesSetNamespaceAllowedClustersJSONRequestBody = NamespacesSetNamespaceAllowedClustersJSONBody
+
 // NamespacesSetNamespaceAntiAffinityGroupJSONRequestBody defines body for NamespacesSetNamespaceAntiAffinityGroup for application/json ContentType.
 type NamespacesSetNamespaceAntiAffinityGroupJSONRequestBody = NamespacesSetNamespaceAntiAffinityGroupJSONBody
 
@@ -4410,8 +4527,8 @@ type ClientInterface interface {
 	// BookiesGetBookieRackInfo request
 	BookiesGetBookieRackInfo(ctx context.Context, bookie string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// BookiesUpdateBookieRackInfo request
-	BookiesUpdateBookieRackInfo(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// BookiesUpdateBookieRackInfoWithBody request with any body
+	BookiesUpdateBookieRackInfoWithBody(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// BrokerStatsBaseGetAllocatorStats request
 	BrokerStatsBaseGetAllocatorStats(ctx context.Context, allocator string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4474,7 +4591,7 @@ type ClientInterface interface {
 	BrokersBaseVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// BrokersBaseGetOwnedNamespaces request
-	BrokersBaseGetOwnedNamespaces(ctx context.Context, clusterName string, brokerWebserviceurl string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	BrokersBaseGetOwnedNamespaces(ctx context.Context, clusterName string, brokerId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// BrokersBaseGetActiveBrokersByCluster request
 	BrokersBaseGetActiveBrokersByCluster(ctx context.Context, cluster string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4555,6 +4672,14 @@ type ClientInterface interface {
 	NamespacesCreateNamespaceWithBody(ctx context.Context, tenant string, namespace string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	NamespacesCreateNamespace(ctx context.Context, tenant string, namespace string, body NamespacesCreateNamespaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NamespacesGetNamespaceAllowedClusters request
+	NamespacesGetNamespaceAllowedClusters(ctx context.Context, tenant string, namespace string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NamespacesSetNamespaceAllowedClustersWithBody request with any body
+	NamespacesSetNamespaceAllowedClustersWithBody(ctx context.Context, tenant string, namespace string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	NamespacesSetNamespaceAllowedClusters(ctx context.Context, tenant string, namespace string, body NamespacesSetNamespaceAllowedClustersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// NamespacesRemoveNamespaceAntiAffinityGroup request
 	NamespacesRemoveNamespaceAntiAffinityGroup(ctx context.Context, tenant string, namespace string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -6032,8 +6157,8 @@ func (c *Client) BookiesGetBookieRackInfo(ctx context.Context, bookie string, re
 	return c.Client.Do(req)
 }
 
-func (c *Client) BookiesUpdateBookieRackInfo(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewBookiesUpdateBookieRackInfoRequest(c.Server, bookie, params)
+func (c *Client) BookiesUpdateBookieRackInfoWithBody(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewBookiesUpdateBookieRackInfoRequestWithBody(c.Server, bookie, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6284,8 +6409,8 @@ func (c *Client) BrokersBaseVersion(ctx context.Context, reqEditors ...RequestEd
 	return c.Client.Do(req)
 }
 
-func (c *Client) BrokersBaseGetOwnedNamespaces(ctx context.Context, clusterName string, brokerWebserviceurl string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewBrokersBaseGetOwnedNamespacesRequest(c.Server, clusterName, brokerWebserviceurl)
+func (c *Client) BrokersBaseGetOwnedNamespaces(ctx context.Context, clusterName string, brokerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewBrokersBaseGetOwnedNamespacesRequest(c.Server, clusterName, brokerId)
 	if err != nil {
 		return nil, err
 	}
@@ -6610,6 +6735,42 @@ func (c *Client) NamespacesCreateNamespaceWithBody(ctx context.Context, tenant s
 
 func (c *Client) NamespacesCreateNamespace(ctx context.Context, tenant string, namespace string, body NamespacesCreateNamespaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewNamespacesCreateNamespaceRequest(c.Server, tenant, namespace, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NamespacesGetNamespaceAllowedClusters(ctx context.Context, tenant string, namespace string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNamespacesGetNamespaceAllowedClustersRequest(c.Server, tenant, namespace)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NamespacesSetNamespaceAllowedClustersWithBody(ctx context.Context, tenant string, namespace string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNamespacesSetNamespaceAllowedClustersRequestWithBody(c.Server, tenant, namespace, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NamespacesSetNamespaceAllowedClusters(ctx context.Context, tenant string, namespace string, body NamespacesSetNamespaceAllowedClustersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNamespacesSetNamespaceAllowedClustersRequest(c.Server, tenant, namespace, body)
 	if err != nil {
 		return nil, err
 	}
@@ -12646,8 +12807,8 @@ func NewBookiesGetBookieRackInfoRequest(server string, bookie string) (*http.Req
 	return req, nil
 }
 
-// NewBookiesUpdateBookieRackInfoRequest generates requests for BookiesUpdateBookieRackInfo
-func NewBookiesUpdateBookieRackInfoRequest(server string, bookie string, params *BookiesUpdateBookieRackInfoParams) (*http.Request, error) {
+// NewBookiesUpdateBookieRackInfoRequestWithBody generates requests for BookiesUpdateBookieRackInfo with any type of body
+func NewBookiesUpdateBookieRackInfoRequestWithBody(server string, bookie string, params *BookiesUpdateBookieRackInfoParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -12675,29 +12836,27 @@ func NewBookiesUpdateBookieRackInfoRequest(server string, bookie string, params 
 	if params != nil {
 		queryValues := queryURL.Query()
 
-		if params.Group != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group", runtime.ParamLocationQuery, *params.Group); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "group", runtime.ParamLocationQuery, params.Group); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
 				}
 			}
-
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -13345,7 +13504,7 @@ func NewBrokersBaseVersionRequest(server string) (*http.Request, error) {
 }
 
 // NewBrokersBaseGetOwnedNamespacesRequest generates requests for BrokersBaseGetOwnedNamespaces
-func NewBrokersBaseGetOwnedNamespacesRequest(server string, clusterName string, brokerWebserviceurl string) (*http.Request, error) {
+func NewBrokersBaseGetOwnedNamespacesRequest(server string, clusterName string, brokerId string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -13357,7 +13516,7 @@ func NewBrokersBaseGetOwnedNamespacesRequest(server string, clusterName string, 
 
 	var pathParam1 string
 
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "broker-webserviceurl", runtime.ParamLocationPath, brokerWebserviceurl)
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "brokerId", runtime.ParamLocationPath, brokerId)
 	if err != nil {
 		return nil, err
 	}
@@ -14447,6 +14606,101 @@ func NewNamespacesCreateNamespaceRequestWithBody(server string, tenant string, n
 	}
 
 	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewNamespacesGetNamespaceAllowedClustersRequest generates requests for NamespacesGetNamespaceAllowedClusters
+func NewNamespacesGetNamespaceAllowedClustersRequest(server string, tenant string, namespace string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "tenant", runtime.ParamLocationPath, tenant)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "namespace", runtime.ParamLocationPath, namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/namespaces/%s/%s/allowedClusters", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNamespacesSetNamespaceAllowedClustersRequest calls the generic NamespacesSetNamespaceAllowedClusters builder with application/json body
+func NewNamespacesSetNamespaceAllowedClustersRequest(server string, tenant string, namespace string, body NamespacesSetNamespaceAllowedClustersJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewNamespacesSetNamespaceAllowedClustersRequestWithBody(server, tenant, namespace, "application/json", bodyReader)
+}
+
+// NewNamespacesSetNamespaceAllowedClustersRequestWithBody generates requests for NamespacesSetNamespaceAllowedClusters with any type of body
+func NewNamespacesSetNamespaceAllowedClustersRequestWithBody(server string, tenant string, namespace string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "tenant", runtime.ParamLocationPath, tenant)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "namespace", runtime.ParamLocationPath, namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/namespaces/%s/%s/allowedClusters", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -46294,8 +46548,8 @@ type ClientWithResponsesInterface interface {
 	// BookiesGetBookieRackInfoWithResponse request
 	BookiesGetBookieRackInfoWithResponse(ctx context.Context, bookie string, reqEditors ...RequestEditorFn) (*BookiesGetBookieRackInfoResponse, error)
 
-	// BookiesUpdateBookieRackInfoWithResponse request
-	BookiesUpdateBookieRackInfoWithResponse(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, reqEditors ...RequestEditorFn) (*BookiesUpdateBookieRackInfoResponse, error)
+	// BookiesUpdateBookieRackInfoWithBodyWithResponse request with any body
+	BookiesUpdateBookieRackInfoWithBodyWithResponse(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BookiesUpdateBookieRackInfoResponse, error)
 
 	// BrokerStatsBaseGetAllocatorStatsWithResponse request
 	BrokerStatsBaseGetAllocatorStatsWithResponse(ctx context.Context, allocator string, reqEditors ...RequestEditorFn) (*BrokerStatsBaseGetAllocatorStatsResponse, error)
@@ -46358,7 +46612,7 @@ type ClientWithResponsesInterface interface {
 	BrokersBaseVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*BrokersBaseVersionResponse, error)
 
 	// BrokersBaseGetOwnedNamespacesWithResponse request
-	BrokersBaseGetOwnedNamespacesWithResponse(ctx context.Context, clusterName string, brokerWebserviceurl string, reqEditors ...RequestEditorFn) (*BrokersBaseGetOwnedNamespacesResponse, error)
+	BrokersBaseGetOwnedNamespacesWithResponse(ctx context.Context, clusterName string, brokerId string, reqEditors ...RequestEditorFn) (*BrokersBaseGetOwnedNamespacesResponse, error)
 
 	// BrokersBaseGetActiveBrokersByClusterWithResponse request
 	BrokersBaseGetActiveBrokersByClusterWithResponse(ctx context.Context, cluster string, reqEditors ...RequestEditorFn) (*BrokersBaseGetActiveBrokersByClusterResponse, error)
@@ -46439,6 +46693,14 @@ type ClientWithResponsesInterface interface {
 	NamespacesCreateNamespaceWithBodyWithResponse(ctx context.Context, tenant string, namespace string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NamespacesCreateNamespaceResponse, error)
 
 	NamespacesCreateNamespaceWithResponse(ctx context.Context, tenant string, namespace string, body NamespacesCreateNamespaceJSONRequestBody, reqEditors ...RequestEditorFn) (*NamespacesCreateNamespaceResponse, error)
+
+	// NamespacesGetNamespaceAllowedClustersWithResponse request
+	NamespacesGetNamespaceAllowedClustersWithResponse(ctx context.Context, tenant string, namespace string, reqEditors ...RequestEditorFn) (*NamespacesGetNamespaceAllowedClustersResponse, error)
+
+	// NamespacesSetNamespaceAllowedClustersWithBodyWithResponse request with any body
+	NamespacesSetNamespaceAllowedClustersWithBodyWithResponse(ctx context.Context, tenant string, namespace string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NamespacesSetNamespaceAllowedClustersResponse, error)
+
+	NamespacesSetNamespaceAllowedClustersWithResponse(ctx context.Context, tenant string, namespace string, body NamespacesSetNamespaceAllowedClustersJSONRequestBody, reqEditors ...RequestEditorFn) (*NamespacesSetNamespaceAllowedClustersResponse, error)
 
 	// NamespacesRemoveNamespaceAntiAffinityGroupWithResponse request
 	NamespacesRemoveNamespaceAntiAffinityGroupWithResponse(ctx context.Context, tenant string, namespace string, reqEditors ...RequestEditorFn) (*NamespacesRemoveNamespaceAntiAffinityGroupResponse, error)
@@ -48176,6 +48438,7 @@ func (r BrokersBaseBacklogQuotaCheckResponse) StatusCode() int {
 type BrokersBaseGetDynamicConfigurationNameResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *[]string
 }
 
 // Status returns HTTPResponse.Status
@@ -48197,6 +48460,7 @@ func (r BrokersBaseGetDynamicConfigurationNameResponse) StatusCode() int {
 type BrokersBaseGetRuntimeConfigurationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -48218,6 +48482,7 @@ func (r BrokersBaseGetRuntimeConfigurationResponse) StatusCode() int {
 type BrokersBaseGetAllDynamicConfigurationsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -48884,7 +49149,7 @@ func (r NamespacesDeleteBookieAffinityGroupResponse) StatusCode() int {
 type NamespacesGetBookieAffinityGroupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *BookieAffinityGroupData
+	JSON200      *BookieAffinityGroupDataImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -48989,6 +49254,49 @@ func (r NamespacesCreateNamespaceResponse) StatusCode() int {
 	return 0
 }
 
+type NamespacesGetNamespaceAllowedClustersResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]string
+}
+
+// Status returns HTTPResponse.Status
+func (r NamespacesGetNamespaceAllowedClustersResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NamespacesGetNamespaceAllowedClustersResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NamespacesSetNamespaceAllowedClustersResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r NamespacesSetNamespaceAllowedClustersResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NamespacesSetNamespaceAllowedClustersResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type NamespacesRemoveNamespaceAntiAffinityGroupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -49077,6 +49385,7 @@ func (r NamespacesRemoveAutoSubscriptionCreationResponse) StatusCode() int {
 type NamespacesGetAutoSubscriptionCreationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *AutoSubscriptionCreationOverrideImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -49140,6 +49449,7 @@ func (r NamespacesRemoveAutoTopicCreationResponse) StatusCode() int {
 type NamespacesGetAutoTopicCreationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *AutoTopicCreationOverrideImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -49224,6 +49534,7 @@ func (r NamespacesSetBacklogQuotaResponse) StatusCode() int {
 type NamespacesGetBacklogQuotaMapResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]BacklogQuotaImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -49245,6 +49556,7 @@ func (r NamespacesGetBacklogQuotaMapResponse) StatusCode() int {
 type NamespacesGetBundlesDataResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *BundlesDataImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -49329,6 +49641,7 @@ func (r NamespacesDeleteCompactionThresholdResponse) StatusCode() int {
 type NamespacesGetCompactionThresholdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int64
 }
 
 // Status returns HTTPResponse.Status
@@ -49392,6 +49705,7 @@ func (r NamespacesRemoveDeduplicationResponse) StatusCode() int {
 type NamespacesGetDeduplicationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *bool
 }
 
 // Status returns HTTPResponse.Status
@@ -49434,6 +49748,7 @@ func (r NamespacesModifyDeduplicationResponse) StatusCode() int {
 type NamespacesGetDeduplicationSnapshotIntervalResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -49497,6 +49812,7 @@ func (r NamespacesRemoveDelayedDeliveryPoliciesResponse) StatusCode() int {
 type NamespacesGetDelayedDeliveryPoliciesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DelayedDeliveryPolicies
 }
 
 // Status returns HTTPResponse.Status
@@ -49560,6 +49876,7 @@ func (r NamespacesDeleteDispatchRateResponse) StatusCode() int {
 type NamespacesGetDispatchRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DispatchRate
 }
 
 // Status returns HTTPResponse.Status
@@ -49602,6 +49919,7 @@ func (r NamespacesSetDispatchRateResponse) StatusCode() int {
 type NamespacesGetEncryptionRequiredResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *bool
 }
 
 // Status returns HTTPResponse.Status
@@ -49665,6 +49983,7 @@ func (r NamespacesRemoveNamespaceEntryFiltersResponse) StatusCode() int {
 type NamespacesGetEntryFiltersPerTopicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *EntryFilters
 }
 
 // Status returns HTTPResponse.Status
@@ -49728,6 +50047,7 @@ func (r NamespacesRemoveInactiveTopicPoliciesResponse) StatusCode() int {
 type NamespacesGetInactiveTopicPoliciesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *InactiveTopicPolicies
 }
 
 // Status returns HTTPResponse.Status
@@ -49770,6 +50090,7 @@ func (r NamespacesSetInactiveTopicPoliciesResponse) StatusCode() int {
 type NamespacesGetIsAllowAutoUpdateSchemaResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *bool
 }
 
 // Status returns HTTPResponse.Status
@@ -49833,6 +50154,7 @@ func (r NamespacesRemoveMaxConsumersPerSubscriptionResponse) StatusCode() int {
 type NamespacesGetMaxConsumersPerSubscriptionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -49896,6 +50218,7 @@ func (r NamespacesRemoveMaxConsumersPerTopicResponse) StatusCode() int {
 type NamespacesGetMaxConsumersPerTopicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -49959,6 +50282,7 @@ func (r NamespacesRemoveMaxProducersPerTopicResponse) StatusCode() int {
 type NamespacesGetMaxProducersPerTopicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -50022,6 +50346,7 @@ func (r NamespacesRemoveMaxSubscriptionsPerTopicResponse) StatusCode() int {
 type NamespacesGetMaxSubscriptionsPerTopicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -50085,6 +50410,7 @@ func (r NamespacesRemoveMaxTopicsPerNamespaceResponse) StatusCode() int {
 type NamespacesGetMaxTopicsPerNamespaceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -50148,6 +50474,7 @@ func (r NamespacesRemoveMaxUnackedmessagesPerConsumerResponse) StatusCode() int 
 type NamespacesGetMaxUnackedMessagesPerConsumerResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -50211,6 +50538,7 @@ func (r NamespacesRemoveMaxUnackedmessagesPerSubscriptionResponse) StatusCode() 
 type NamespacesGetMaxUnackedmessagesPerSubscriptionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -50338,6 +50666,7 @@ func (r NamespacesClearOffloadDeletionLagResponse) StatusCode() int {
 type NamespacesGetOffloadDeletionLagResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int64
 }
 
 // Status returns HTTPResponse.Status
@@ -50380,6 +50709,7 @@ func (r NamespacesSetOffloadDeletionLagResponse) StatusCode() int {
 type NamespacesGetOffloadPoliciesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *OffloadPolicies
 }
 
 // Status returns HTTPResponse.Status
@@ -50422,6 +50752,7 @@ func (r NamespacesSetOffloadPoliciesResponse) StatusCode() int {
 type NamespacesGetOffloadThresholdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int64
 }
 
 // Status returns HTTPResponse.Status
@@ -50464,6 +50795,7 @@ func (r NamespacesSetOffloadThresholdResponse) StatusCode() int {
 type NamespacesGetOffloadThresholdInSecondsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int64
 }
 
 // Status returns HTTPResponse.Status
@@ -50506,6 +50838,7 @@ func (r NamespacesSetOffloadThresholdInSecondsResponse) StatusCode() int {
 type NamespacesGetPermissionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -50527,6 +50860,7 @@ func (r NamespacesGetPermissionsResponse) StatusCode() int {
 type NamespacesGetPermissionOnSubscriptionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -50611,6 +50945,7 @@ func (r NamespacesDeletePersistenceResponse) StatusCode() int {
 type NamespacesGetPersistenceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *PersistencePolicies
 }
 
 // Status returns HTTPResponse.Status
@@ -50695,6 +51030,7 @@ func (r NamespacesClearPropertiesResponse) StatusCode() int {
 type NamespacesGetPropertiesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -50758,6 +51094,7 @@ func (r NamespacesRemovePropertyResponse) StatusCode() int {
 type NamespacesGetPropertyResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *string
 }
 
 // Status returns HTTPResponse.Status
@@ -50885,6 +51222,7 @@ func (r NamespacesRemoveReplicatorDispatchRateResponse) StatusCode() int {
 type NamespacesGetReplicatorDispatchRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DispatchRateImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -50948,6 +51286,7 @@ func (r NamespacesRemoveNamespaceResourceGroupResponse) StatusCode() int {
 type NamespacesGetNamespaceResourceGroupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *string
 }
 
 // Status returns HTTPResponse.Status
@@ -51011,6 +51350,7 @@ func (r NamespacesRemoveRetentionResponse) StatusCode() int {
 type NamespacesGetRetentionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *RetentionPolicies
 }
 
 // Status returns HTTPResponse.Status
@@ -51117,6 +51457,7 @@ func (r NamespacesSetSchemaAutoUpdateCompatibilityStrategyResponse) StatusCode()
 type NamespacesGetSchemaCompatibilityStrategyResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *string
 }
 
 // Status returns HTTPResponse.Status
@@ -51159,6 +51500,7 @@ func (r NamespacesSetSchemaCompatibilityStrategyResponse) StatusCode() int {
 type NamespacesGetSchemaValidtionEnforcedResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *bool
 }
 
 // Status returns HTTPResponse.Status
@@ -51222,6 +51564,7 @@ func (r NamespacesDeleteSubscribeRateResponse) StatusCode() int {
 type NamespacesGetSubscribeRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *SubscribeRate
 }
 
 // Status returns HTTPResponse.Status
@@ -51264,6 +51607,7 @@ func (r NamespacesSetSubscribeRateResponse) StatusCode() int {
 type NamespacesGetSubscriptionAuthModeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *string
 }
 
 // Status returns HTTPResponse.Status
@@ -51327,6 +51671,7 @@ func (r NamespacesDeleteSubscriptionDispatchRateResponse) StatusCode() int {
 type NamespacesGetSubscriptionDispatchRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DispatchRate
 }
 
 // Status returns HTTPResponse.Status
@@ -51390,6 +51735,7 @@ func (r NamespacesRemoveSubscriptionExpirationTimeResponse) StatusCode() int {
 type NamespacesGetSubscriptionExpirationTimeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *int32
 }
 
 // Status returns HTTPResponse.Status
@@ -51453,6 +51799,7 @@ func (r NamespacesRemoveSubscriptionTypesEnabledResponse) StatusCode() int {
 type NamespacesGetSubscriptionTypesEnabledResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *[]string
 }
 
 // Status returns HTTPResponse.Status
@@ -51643,6 +51990,7 @@ func (r NamespacesSplitNamespaceBundleResponse) StatusCode() int {
 type NamespacesGetTopicHashPositionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *TopicHashPositions
 }
 
 // Status returns HTTPResponse.Status
@@ -51856,6 +52204,7 @@ func (r NonPersistentTopicsRemoveAutoSubscriptionCreationResponse) StatusCode() 
 type NonPersistentTopicsGetAutoSubscriptionCreationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *AutoSubscriptionCreationOverrideImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -52006,6 +52355,7 @@ func (r NonPersistentTopicsGetBacklogSizeByMessageIdResponse) StatusCode() int {
 type NonPersistentTopicsCompactionStatusResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *LongRunningProcessStatus
 }
 
 // Status returns HTTPResponse.Status
@@ -52346,6 +52696,7 @@ func (r NonPersistentTopicsRemoveDispatchRateResponse) StatusCode() int {
 type NonPersistentTopicsGetDispatchRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DispatchRateImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -52409,6 +52760,7 @@ func (r NonPersistentTopicsRemoveEntryFiltersResponse) StatusCode() int {
 type NonPersistentTopicsGetEntryFiltersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *EntryFilters
 }
 
 // Status returns HTTPResponse.Status
@@ -52558,6 +52910,7 @@ func (r NonPersistentTopicsGetManagedLedgerInfoResponse) StatusCode() int {
 type NonPersistentTopicsGetInternalStatsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *PersistentTopicInternalStats
 }
 
 // Status returns HTTPResponse.Status
@@ -52579,6 +52932,7 @@ func (r NonPersistentTopicsGetInternalStatsResponse) StatusCode() int {
 type NonPersistentTopicsGetLastMessageIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *MessageIdAdv
 }
 
 // Status returns HTTPResponse.Status
@@ -53133,6 +53487,7 @@ func (r NonPersistentTopicsSetMessageTTLResponse) StatusCode() int {
 type NonPersistentTopicsGetMessageIdByTimestampResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *MessageIdAdv
 }
 
 // Status returns HTTPResponse.Status
@@ -53154,6 +53509,7 @@ func (r NonPersistentTopicsGetMessageIdByTimestampResponse) StatusCode() int {
 type NonPersistentTopicsOffloadStatusResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *OffloadProcessStatus
 }
 
 // Status returns HTTPResponse.Status
@@ -53217,6 +53573,7 @@ func (r NonPersistentTopicsRemoveOffloadPoliciesResponse) StatusCode() int {
 type NonPersistentTopicsGetOffloadPoliciesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *OffloadPoliciesImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -53324,6 +53681,7 @@ func (r NonPersistentTopicsDeletePartitionedTopicResponse) StatusCode() int {
 type NonPersistentTopicsGetPartitionedMetadataResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *PartitionedTopicMetadata
 }
 
 // Status returns HTTPResponse.Status
@@ -53387,6 +53745,7 @@ func (r NonPersistentTopicsCreatePartitionedTopicResponse) StatusCode() int {
 type NonPersistentTopicsGetPermissionsOnTopicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -53898,6 +54257,7 @@ func (r NonPersistentTopicsSetSchemaCompatibilityStrategyResponse) StatusCode() 
 type NonPersistentTopicsGetSchemaValidationEnforcedResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *bool
 }
 
 // Status returns HTTPResponse.Status
@@ -53961,6 +54321,7 @@ func (r NonPersistentTopicsDeleteShadowTopicsResponse) StatusCode() int {
 type NonPersistentTopicsGetShadowTopicsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *[]string
 }
 
 // Status returns HTTPResponse.Status
@@ -54194,6 +54555,7 @@ func (r NonPersistentTopicsPeekNthMessageResponse) StatusCode() int {
 type NonPersistentTopicsGetSubscriptionPropertiesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -54534,6 +54896,7 @@ func (r NonPersistentTopicsGetSubscriptionsResponse) StatusCode() int {
 type NonPersistentTopicsTerminateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *MessageIdAdv
 }
 
 // Status returns HTTPResponse.Status
@@ -54660,6 +55023,7 @@ func (r NonPersistentTopicsRemoveSubscriptionLevelDispatchRateResponse) StatusCo
 type NonPersistentTopicsGetSubscriptionLevelDispatchRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DispatchRate
 }
 
 // Status returns HTTPResponse.Status
@@ -54830,6 +55194,7 @@ func (r PersistentTopicsRemoveAutoSubscriptionCreationResponse) StatusCode() int
 type PersistentTopicsGetAutoSubscriptionCreationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *AutoSubscriptionCreationOverrideImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -54980,6 +55345,7 @@ func (r PersistentTopicsGetBacklogSizeByMessageIdResponse) StatusCode() int {
 type PersistentTopicsCompactionStatusResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *LongRunningProcessStatus
 }
 
 // Status returns HTTPResponse.Status
@@ -55320,6 +55686,7 @@ func (r PersistentTopicsRemoveDispatchRateResponse) StatusCode() int {
 type PersistentTopicsGetDispatchRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DispatchRateImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -55383,6 +55750,7 @@ func (r PersistentTopicsRemoveEntryFiltersResponse) StatusCode() int {
 type PersistentTopicsGetEntryFiltersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *EntryFilters
 }
 
 // Status returns HTTPResponse.Status
@@ -55554,6 +55922,7 @@ func (r PersistentTopicsGetInternalStatsResponse) StatusCode() int {
 type PersistentTopicsGetLastMessageIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *MessageIdAdv
 }
 
 // Status returns HTTPResponse.Status
@@ -56108,6 +56477,7 @@ func (r PersistentTopicsSetMessageTTLResponse) StatusCode() int {
 type PersistentTopicsGetMessageIdByTimestampResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *MessageIdAdv
 }
 
 // Status returns HTTPResponse.Status
@@ -56129,6 +56499,7 @@ func (r PersistentTopicsGetMessageIdByTimestampResponse) StatusCode() int {
 type PersistentTopicsOffloadStatusResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *OffloadProcessStatus
 }
 
 // Status returns HTTPResponse.Status
@@ -56192,6 +56563,7 @@ func (r PersistentTopicsRemoveOffloadPoliciesResponse) StatusCode() int {
 type PersistentTopicsGetOffloadPoliciesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *OffloadPoliciesImpl
 }
 
 // Status returns HTTPResponse.Status
@@ -56363,6 +56735,7 @@ func (r PersistentTopicsCreatePartitionedTopicResponse) StatusCode() int {
 type PersistentTopicsGetPermissionsOnTopicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -56874,6 +57247,7 @@ func (r PersistentTopicsSetSchemaCompatibilityStrategyResponse) StatusCode() int
 type PersistentTopicsGetSchemaValidationEnforcedResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *bool
 }
 
 // Status returns HTTPResponse.Status
@@ -56937,6 +57311,7 @@ func (r PersistentTopicsDeleteShadowTopicsResponse) StatusCode() int {
 type PersistentTopicsGetShadowTopicsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *[]string
 }
 
 // Status returns HTTPResponse.Status
@@ -57170,6 +57545,7 @@ func (r PersistentTopicsPeekNthMessageResponse) StatusCode() int {
 type PersistentTopicsGetSubscriptionPropertiesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *map[string]string
 }
 
 // Status returns HTTPResponse.Status
@@ -57510,6 +57886,7 @@ func (r PersistentTopicsGetSubscriptionsResponse) StatusCode() int {
 type PersistentTopicsTerminateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *MessageIdAdv
 }
 
 // Status returns HTTPResponse.Status
@@ -57636,6 +58013,7 @@ func (r PersistentTopicsRemoveSubscriptionLevelDispatchRateResponse) StatusCode(
 type PersistentTopicsGetSubscriptionLevelDispatchRateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *DispatchRate
 }
 
 // Status returns HTTPResponse.Status
@@ -57743,6 +58121,7 @@ func (r ResourceQuotasRemoveNamespaceBundleResourceQuotaResponse) StatusCode() i
 type ResourceQuotasGetNamespaceBundleResourceQuotaResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *ResourceQuota
 }
 
 // Status returns HTTPResponse.Status
@@ -58263,7 +58642,7 @@ func (r WorkerIsLeaderReadyResponse) StatusCode() int {
 type WorkerGetConnectorsListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *[]map[string]interface{}
+	JSON200      *[]ConnectorDefinition
 }
 
 // Status returns HTTPResponse.Status
@@ -58423,9 +58802,9 @@ func (c *ClientWithResponses) BookiesGetBookieRackInfoWithResponse(ctx context.C
 	return ParseBookiesGetBookieRackInfoResponse(rsp)
 }
 
-// BookiesUpdateBookieRackInfoWithResponse request returning *BookiesUpdateBookieRackInfoResponse
-func (c *ClientWithResponses) BookiesUpdateBookieRackInfoWithResponse(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, reqEditors ...RequestEditorFn) (*BookiesUpdateBookieRackInfoResponse, error) {
-	rsp, err := c.BookiesUpdateBookieRackInfo(ctx, bookie, params, reqEditors...)
+// BookiesUpdateBookieRackInfoWithBodyWithResponse request with arbitrary body returning *BookiesUpdateBookieRackInfoResponse
+func (c *ClientWithResponses) BookiesUpdateBookieRackInfoWithBodyWithResponse(ctx context.Context, bookie string, params *BookiesUpdateBookieRackInfoParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BookiesUpdateBookieRackInfoResponse, error) {
+	rsp, err := c.BookiesUpdateBookieRackInfoWithBody(ctx, bookie, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -58613,8 +58992,8 @@ func (c *ClientWithResponses) BrokersBaseVersionWithResponse(ctx context.Context
 }
 
 // BrokersBaseGetOwnedNamespacesWithResponse request returning *BrokersBaseGetOwnedNamespacesResponse
-func (c *ClientWithResponses) BrokersBaseGetOwnedNamespacesWithResponse(ctx context.Context, clusterName string, brokerWebserviceurl string, reqEditors ...RequestEditorFn) (*BrokersBaseGetOwnedNamespacesResponse, error) {
-	rsp, err := c.BrokersBaseGetOwnedNamespaces(ctx, clusterName, brokerWebserviceurl, reqEditors...)
+func (c *ClientWithResponses) BrokersBaseGetOwnedNamespacesWithResponse(ctx context.Context, clusterName string, brokerId string, reqEditors ...RequestEditorFn) (*BrokersBaseGetOwnedNamespacesResponse, error) {
+	rsp, err := c.BrokersBaseGetOwnedNamespaces(ctx, clusterName, brokerId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -58861,6 +59240,32 @@ func (c *ClientWithResponses) NamespacesCreateNamespaceWithResponse(ctx context.
 		return nil, err
 	}
 	return ParseNamespacesCreateNamespaceResponse(rsp)
+}
+
+// NamespacesGetNamespaceAllowedClustersWithResponse request returning *NamespacesGetNamespaceAllowedClustersResponse
+func (c *ClientWithResponses) NamespacesGetNamespaceAllowedClustersWithResponse(ctx context.Context, tenant string, namespace string, reqEditors ...RequestEditorFn) (*NamespacesGetNamespaceAllowedClustersResponse, error) {
+	rsp, err := c.NamespacesGetNamespaceAllowedClusters(ctx, tenant, namespace, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNamespacesGetNamespaceAllowedClustersResponse(rsp)
+}
+
+// NamespacesSetNamespaceAllowedClustersWithBodyWithResponse request with arbitrary body returning *NamespacesSetNamespaceAllowedClustersResponse
+func (c *ClientWithResponses) NamespacesSetNamespaceAllowedClustersWithBodyWithResponse(ctx context.Context, tenant string, namespace string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NamespacesSetNamespaceAllowedClustersResponse, error) {
+	rsp, err := c.NamespacesSetNamespaceAllowedClustersWithBody(ctx, tenant, namespace, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNamespacesSetNamespaceAllowedClustersResponse(rsp)
+}
+
+func (c *ClientWithResponses) NamespacesSetNamespaceAllowedClustersWithResponse(ctx context.Context, tenant string, namespace string, body NamespacesSetNamespaceAllowedClustersJSONRequestBody, reqEditors ...RequestEditorFn) (*NamespacesSetNamespaceAllowedClustersResponse, error) {
+	rsp, err := c.NamespacesSetNamespaceAllowedClusters(ctx, tenant, namespace, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNamespacesSetNamespaceAllowedClustersResponse(rsp)
 }
 
 // NamespacesRemoveNamespaceAntiAffinityGroupWithResponse request returning *NamespacesRemoveNamespaceAntiAffinityGroupResponse
@@ -63589,6 +63994,16 @@ func ParseBrokersBaseGetDynamicConfigurationNameResponse(rsp *http.Response) (*B
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -63605,6 +64020,16 @@ func ParseBrokersBaseGetRuntimeConfigurationResponse(rsp *http.Response) (*Broke
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -63619,6 +64044,16 @@ func ParseBrokersBaseGetAllDynamicConfigurationsResponse(rsp *http.Response) (*B
 	response := &BrokersBaseGetAllDynamicConfigurationsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -64269,7 +64704,7 @@ func ParseNamespacesGetBookieAffinityGroupResponse(rsp *http.Response) (*Namespa
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest BookieAffinityGroupData
+		var dest BookieAffinityGroupDataImpl
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -64364,6 +64799,48 @@ func ParseNamespacesCreateNamespaceResponse(rsp *http.Response) (*NamespacesCrea
 	return response, nil
 }
 
+// ParseNamespacesGetNamespaceAllowedClustersResponse parses an HTTP response from a NamespacesGetNamespaceAllowedClustersWithResponse call
+func ParseNamespacesGetNamespaceAllowedClustersResponse(rsp *http.Response) (*NamespacesGetNamespaceAllowedClustersResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NamespacesGetNamespaceAllowedClustersResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNamespacesSetNamespaceAllowedClustersResponse parses an HTTP response from a NamespacesSetNamespaceAllowedClustersWithResponse call
+func ParseNamespacesSetNamespaceAllowedClustersResponse(rsp *http.Response) (*NamespacesSetNamespaceAllowedClustersResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NamespacesSetNamespaceAllowedClustersResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
 // ParseNamespacesRemoveNamespaceAntiAffinityGroupResponse parses an HTTP response from a NamespacesRemoveNamespaceAntiAffinityGroupWithResponse call
 func ParseNamespacesRemoveNamespaceAntiAffinityGroupResponse(rsp *http.Response) (*NamespacesRemoveNamespaceAntiAffinityGroupResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -64451,6 +64928,16 @@ func ParseNamespacesGetAutoSubscriptionCreationResponse(rsp *http.Response) (*Na
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AutoSubscriptionCreationOverrideImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64497,6 +64984,16 @@ func ParseNamespacesGetAutoTopicCreationResponse(rsp *http.Response) (*Namespace
 	response := &NamespacesGetAutoTopicCreationResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AutoTopicCreationOverrideImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -64563,6 +65060,16 @@ func ParseNamespacesGetBacklogQuotaMapResponse(rsp *http.Response) (*NamespacesG
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]BacklogQuotaImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64577,6 +65084,16 @@ func ParseNamespacesGetBundlesDataResponse(rsp *http.Response) (*NamespacesGetBu
 	response := &NamespacesGetBundlesDataResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest BundlesDataImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -64643,6 +65160,16 @@ func ParseNamespacesGetCompactionThresholdResponse(rsp *http.Response) (*Namespa
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int64
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64691,6 +65218,16 @@ func ParseNamespacesGetDeduplicationResponse(rsp *http.Response) (*NamespacesGet
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest bool
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64721,6 +65258,16 @@ func ParseNamespacesGetDeduplicationSnapshotIntervalResponse(rsp *http.Response)
 	response := &NamespacesGetDeduplicationSnapshotIntervalResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -64771,6 +65318,16 @@ func ParseNamespacesGetDelayedDeliveryPoliciesResponse(rsp *http.Response) (*Nam
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DelayedDeliveryPolicies
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64819,6 +65376,16 @@ func ParseNamespacesGetDispatchRateResponse(rsp *http.Response) (*NamespacesGetD
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DispatchRate
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64849,6 +65416,16 @@ func ParseNamespacesGetEncryptionRequiredResponse(rsp *http.Response) (*Namespac
 	response := &NamespacesGetEncryptionRequiredResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest bool
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -64899,6 +65476,16 @@ func ParseNamespacesGetEntryFiltersPerTopicResponse(rsp *http.Response) (*Namesp
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest EntryFilters
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64947,6 +65534,16 @@ func ParseNamespacesGetInactiveTopicPoliciesResponse(rsp *http.Response) (*Names
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InactiveTopicPolicies
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -64977,6 +65574,16 @@ func ParseNamespacesGetIsAllowAutoUpdateSchemaResponse(rsp *http.Response) (*Nam
 	response := &NamespacesGetIsAllowAutoUpdateSchemaResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest bool
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65027,6 +65634,16 @@ func ParseNamespacesGetMaxConsumersPerSubscriptionResponse(rsp *http.Response) (
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65073,6 +65690,16 @@ func ParseNamespacesGetMaxConsumersPerTopicResponse(rsp *http.Response) (*Namesp
 	response := &NamespacesGetMaxConsumersPerTopicResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65123,6 +65750,16 @@ func ParseNamespacesGetMaxProducersPerTopicResponse(rsp *http.Response) (*Namesp
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65169,6 +65806,16 @@ func ParseNamespacesGetMaxSubscriptionsPerTopicResponse(rsp *http.Response) (*Na
 	response := &NamespacesGetMaxSubscriptionsPerTopicResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65219,6 +65866,16 @@ func ParseNamespacesGetMaxTopicsPerNamespaceResponse(rsp *http.Response) (*Names
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65267,6 +65924,16 @@ func ParseNamespacesGetMaxUnackedMessagesPerConsumerResponse(rsp *http.Response)
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65313,6 +65980,16 @@ func ParseNamespacesGetMaxUnackedmessagesPerSubscriptionResponse(rsp *http.Respo
 	response := &NamespacesGetMaxUnackedmessagesPerSubscriptionResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65421,6 +66098,16 @@ func ParseNamespacesGetOffloadDeletionLagResponse(rsp *http.Response) (*Namespac
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int64
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65451,6 +66138,16 @@ func ParseNamespacesGetOffloadPoliciesResponse(rsp *http.Response) (*NamespacesG
 	response := &NamespacesGetOffloadPoliciesResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OffloadPolicies
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65485,6 +66182,16 @@ func ParseNamespacesGetOffloadThresholdResponse(rsp *http.Response) (*Namespaces
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int64
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65515,6 +66222,16 @@ func ParseNamespacesGetOffloadThresholdInSecondsResponse(rsp *http.Response) (*N
 	response := &NamespacesGetOffloadThresholdInSecondsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int64
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65549,6 +66266,16 @@ func ParseNamespacesGetPermissionsResponse(rsp *http.Response) (*NamespacesGetPe
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65563,6 +66290,16 @@ func ParseNamespacesGetPermissionOnSubscriptionResponse(rsp *http.Response) (*Na
 	response := &NamespacesGetPermissionOnSubscriptionResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65629,6 +66366,16 @@ func ParseNamespacesGetPersistenceResponse(rsp *http.Response) (*NamespacesGetPe
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PersistencePolicies
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65693,6 +66440,16 @@ func ParseNamespacesGetPropertiesResponse(rsp *http.Response) (*NamespacesGetPro
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65739,6 +66496,16 @@ func ParseNamespacesGetPropertyResponse(rsp *http.Response) (*NamespacesGetPrope
 	response := &NamespacesGetPropertyResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -65847,6 +66614,16 @@ func ParseNamespacesGetReplicatorDispatchRateResponse(rsp *http.Response) (*Name
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DispatchRateImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65895,6 +66672,16 @@ func ParseNamespacesGetNamespaceResourceGroupResponse(rsp *http.Response) (*Name
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -65941,6 +66728,16 @@ func ParseNamespacesGetRetentionResponse(rsp *http.Response) (*NamespacesGetRete
 	response := &NamespacesGetRetentionResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RetentionPolicies
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -66033,6 +66830,16 @@ func ParseNamespacesGetSchemaCompatibilityStrategyResponse(rsp *http.Response) (
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -66063,6 +66870,16 @@ func ParseNamespacesGetSchemaValidtionEnforcedResponse(rsp *http.Response) (*Nam
 	response := &NamespacesGetSchemaValidtionEnforcedResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest bool
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -66113,6 +66930,16 @@ func ParseNamespacesGetSubscribeRateResponse(rsp *http.Response) (*NamespacesGet
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest SubscribeRate
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -66143,6 +66970,16 @@ func ParseNamespacesGetSubscriptionAuthModeResponse(rsp *http.Response) (*Namesp
 	response := &NamespacesGetSubscriptionAuthModeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -66193,6 +67030,16 @@ func ParseNamespacesGetSubscriptionDispatchRateResponse(rsp *http.Response) (*Na
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DispatchRate
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -66241,6 +67088,16 @@ func ParseNamespacesGetSubscriptionExpirationTimeResponse(rsp *http.Response) (*
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest int32
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -66287,6 +67144,16 @@ func ParseNamespacesGetSubscriptionTypesEnabledResponse(rsp *http.Response) (*Na
 	response := &NamespacesGetSubscriptionTypesEnabledResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -66441,6 +67308,16 @@ func ParseNamespacesGetTopicHashPositionsResponse(rsp *http.Response) (*Namespac
 	response := &NamespacesGetTopicHashPositionsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest TopicHashPositions
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -66633,6 +67510,16 @@ func ParseNonPersistentTopicsGetAutoSubscriptionCreationResponse(rsp *http.Respo
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AutoSubscriptionCreationOverrideImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -66773,6 +67660,16 @@ func ParseNonPersistentTopicsCompactionStatusResponse(rsp *http.Response) (*NonP
 	response := &NonPersistentTopicsCompactionStatusResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest LongRunningProcessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -67071,6 +67968,16 @@ func ParseNonPersistentTopicsGetDispatchRateResponse(rsp *http.Response) (*NonPe
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DispatchRateImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -67117,6 +68024,16 @@ func ParseNonPersistentTopicsGetEntryFiltersResponse(rsp *http.Response) (*NonPe
 	response := &NonPersistentTopicsGetEntryFiltersResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest EntryFilters
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -67251,6 +68168,16 @@ func ParseNonPersistentTopicsGetInternalStatsResponse(rsp *http.Response) (*NonP
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PersistentTopicInternalStats
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -67265,6 +68192,16 @@ func ParseNonPersistentTopicsGetLastMessageIdResponse(rsp *http.Response) (*NonP
 	response := &NonPersistentTopicsGetLastMessageIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest MessageIdAdv
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -67763,6 +68700,16 @@ func ParseNonPersistentTopicsGetMessageIdByTimestampResponse(rsp *http.Response)
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest MessageIdAdv
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -67777,6 +68724,16 @@ func ParseNonPersistentTopicsOffloadStatusResponse(rsp *http.Response) (*NonPers
 	response := &NonPersistentTopicsOffloadStatusResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OffloadProcessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -67825,6 +68782,16 @@ func ParseNonPersistentTopicsGetOffloadPoliciesResponse(rsp *http.Response) (*No
 	response := &NonPersistentTopicsGetOffloadPoliciesResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OffloadPoliciesImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -67927,6 +68894,16 @@ func ParseNonPersistentTopicsGetPartitionedMetadataResponse(rsp *http.Response) 
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PartitionedTopicMetadata
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -67973,6 +68950,16 @@ func ParseNonPersistentTopicsGetPermissionsOnTopicResponse(rsp *http.Response) (
 	response := &NonPersistentTopicsGetPermissionsOnTopicResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -68429,6 +69416,16 @@ func ParseNonPersistentTopicsGetSchemaValidationEnforcedResponse(rsp *http.Respo
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest bool
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -68475,6 +69472,16 @@ func ParseNonPersistentTopicsGetShadowTopicsResponse(rsp *http.Response) (*NonPe
 	response := &NonPersistentTopicsGetShadowTopicsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -68671,6 +69678,16 @@ func ParseNonPersistentTopicsGetSubscriptionPropertiesResponse(rsp *http.Respons
 	response := &NonPersistentTopicsGetSubscriptionPropertiesResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -68969,6 +69986,16 @@ func ParseNonPersistentTopicsTerminateResponse(rsp *http.Response) (*NonPersiste
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest MessageIdAdv
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -69063,6 +70090,16 @@ func ParseNonPersistentTopicsGetSubscriptionLevelDispatchRateResponse(rsp *http.
 	response := &NonPersistentTopicsGetSubscriptionLevelDispatchRateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DispatchRate
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -69213,6 +70250,16 @@ func ParsePersistentTopicsGetAutoSubscriptionCreationResponse(rsp *http.Response
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AutoSubscriptionCreationOverrideImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -69353,6 +70400,16 @@ func ParsePersistentTopicsCompactionStatusResponse(rsp *http.Response) (*Persist
 	response := &PersistentTopicsCompactionStatusResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest LongRunningProcessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -69651,6 +70708,16 @@ func ParsePersistentTopicsGetDispatchRateResponse(rsp *http.Response) (*Persiste
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DispatchRateImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -69697,6 +70764,16 @@ func ParsePersistentTopicsGetEntryFiltersResponse(rsp *http.Response) (*Persiste
 	response := &PersistentTopicsGetEntryFiltersResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest EntryFilters
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -69855,6 +70932,16 @@ func ParsePersistentTopicsGetLastMessageIdResponse(rsp *http.Response) (*Persist
 	response := &PersistentTopicsGetLastMessageIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest MessageIdAdv
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -70353,6 +71440,16 @@ func ParsePersistentTopicsGetMessageIdByTimestampResponse(rsp *http.Response) (*
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest MessageIdAdv
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -70367,6 +71464,16 @@ func ParsePersistentTopicsOffloadStatusResponse(rsp *http.Response) (*Persistent
 	response := &PersistentTopicsOffloadStatusResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OffloadProcessStatus
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -70415,6 +71522,16 @@ func ParsePersistentTopicsGetOffloadPoliciesResponse(rsp *http.Response) (*Persi
 	response := &PersistentTopicsGetOffloadPoliciesResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OffloadPoliciesImpl
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -70573,6 +71690,16 @@ func ParsePersistentTopicsGetPermissionsOnTopicResponse(rsp *http.Response) (*Pe
 	response := &PersistentTopicsGetPermissionsOnTopicResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -71029,6 +72156,16 @@ func ParsePersistentTopicsGetSchemaValidationEnforcedResponse(rsp *http.Response
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest bool
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -71075,6 +72212,16 @@ func ParsePersistentTopicsGetShadowTopicsResponse(rsp *http.Response) (*Persiste
 	response := &PersistentTopicsGetShadowTopicsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -71271,6 +72418,16 @@ func ParsePersistentTopicsGetSubscriptionPropertiesResponse(rsp *http.Response) 
 	response := &PersistentTopicsGetSubscriptionPropertiesResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]string
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -71569,6 +72726,16 @@ func ParsePersistentTopicsTerminateResponse(rsp *http.Response) (*PersistentTopi
 		HTTPResponse: rsp,
 	}
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest MessageIdAdv
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -71663,6 +72830,16 @@ func ParsePersistentTopicsGetSubscriptionLevelDispatchRateResponse(rsp *http.Res
 	response := &PersistentTopicsGetSubscriptionLevelDispatchRateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DispatchRate
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -71763,6 +72940,16 @@ func ParseResourceQuotasGetNamespaceBundleResourceQuotaResponse(rsp *http.Respon
 	response := &ResourceQuotasGetNamespaceBundleResourceQuotaResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResourceQuota
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -72311,7 +73498,7 @@ func ParseWorkerGetConnectorsListResponse(rsp *http.Response) (*WorkerGetConnect
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []map[string]interface{}
+		var dest []ConnectorDefinition
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

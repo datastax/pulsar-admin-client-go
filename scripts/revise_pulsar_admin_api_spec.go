@@ -1,3 +1,5 @@
+// This script fixes the bugs such as duplicate IDs and other issues in the
+// Pulsar swagger spec.
 package main
 
 import (
@@ -26,15 +28,18 @@ var (
 	operationIDMatch = `\s+"operationId": "(\w+)",`
 	operationIDRegex = regexp.MustCompile(operationIDMatch)
 
-	// expireMessagesTimeEndpointMatch matches a specific endpoint which must be revised to avoid duplicate operation ID
-	expireMessagesTimeEndpointMatch = `\s+"/(non-)?persistent/\{tenant\}/\{namespace\}/\{topic\}/subscription/\{subName\}/expireMessages/\{expireTimeInSeconds\}": {`
-	expireMessagesTimeEndpointRegex = regexp.MustCompile(expireMessagesTimeEndpointMatch)
+	// patternExpireMessagesTimeEndpoint matches a specific endpoint which must be revised to avoid duplicate operation ID
+	patternExpireMessagesTimeEndpoint = `\s+"/(non-)?persistent/\{tenant\}/\{namespace\}/\{topic\}/subscription/\{subName\}/expireMessages/\{expireTimeInSeconds\}": {`
+	regexExpireMessagesTimeEndpoint   = regexp.MustCompile(patternExpireMessagesTimeEndpoint)
 
-	matchSchemasWithVersionEndpoint = `\s+"/schemas/\{tenant\}/\{namespace\}/\{topic\}/schema/\{version\}": {`
-	regexSchemasWithVersionEndpoint = regexp.MustCompile(matchSchemasWithVersionEndpoint)
+	patternSchemasWithVersionEndpoint = `\s+"/schemas/\{tenant\}/\{namespace\}/\{topic\}/schema/\{version\}": {`
+	regexSchemasWithVersionEndpoint   = regexp.MustCompile(patternSchemasWithVersionEndpoint)
 
-	matchBrokersByClusterEndpoint = `\s+"/brokers/\{cluster\}": {`
-	regexBrokersByClusterEndpoint = regexp.MustCompile(matchBrokersByClusterEndpoint)
+	patternBrokersByClusterEndpoint = `\s+"/brokers/\{cluster\}": {`
+	regexBrokersByClusterEndpoint   = regexp.MustCompile(patternBrokersByClusterEndpoint)
+
+	patternMaxTopicsPerNamespaceEndpoint = `\s+"/namespaces/\{tenant\}/\{namespace\}/maxTopicsPerNamespace": {`
+	regexMaxTopicsPerNamespaceEndpoint   = regexp.MustCompile(patternMaxTopicsPerNamespaceEndpoint)
 )
 
 func usage() {
@@ -66,6 +71,8 @@ func main() {
 	inExpireMessageEndpoint := false
 	inSchemaByVersionEndpoint := false
 	inBrokersByClusterEndpoint := false
+	inMaxTopicsPerNamespaceEndpoint := false
+	fixedMaxTopicsPerNamespaceDelete := false
 
 	scanner := bufio.NewScanner(inputFile)
 	writer := bufio.NewWriter(outputFile)
@@ -75,9 +82,10 @@ func main() {
 		if endpointRegex.Match(nextLine) {
 			// In an endpoint definition, so check for the endpoints we want to modify
 			inNonPersistentTopic = nonPersistentTopicEndpointRegex.Match(nextLine)
-			inExpireMessageEndpoint = expireMessagesTimeEndpointRegex.Match(nextLine)
+			inExpireMessageEndpoint = regexExpireMessagesTimeEndpoint.Match(nextLine)
 			inSchemaByVersionEndpoint = regexSchemasWithVersionEndpoint.Match(nextLine)
 			inBrokersByClusterEndpoint = regexBrokersByClusterEndpoint.Match(nextLine)
+			inMaxTopicsPerNamespaceEndpoint = regexMaxTopicsPerNamespaceEndpoint.Match(nextLine)
 		}
 
 		nextLineOut := string(nextLine)
@@ -93,6 +101,14 @@ func main() {
 			}
 			if inBrokersByClusterEndpoint {
 				nextLineOut = strings.Replace(nextLineOut, "BrokersBase_getActiveBrokers", "BrokersBase_getActiveBrokersByCluster", 1)
+			}
+			if inMaxTopicsPerNamespaceEndpoint {
+				if !fixedMaxTopicsPerNamespaceDelete {
+					nextLineOut = strings.Replace(nextLineOut, "Namespaces_setInactiveTopicPolicies", "Namespaces_removeMaxTopicsPerNamespace", 1)
+					fixedMaxTopicsPerNamespaceDelete = true
+				} else {
+					nextLineOut = strings.Replace(nextLineOut, "Namespaces_setInactiveTopicPolicies", "Namespaces_setMaxTopicsPerNamespace", 1)
+				}
 			}
 		}
 

@@ -87,17 +87,31 @@ paths:
       parameters:
         - name: bookie
           in: path
+          description: The bookie address
           required: true
           schema:
             type: string
         - name: group
           in: query
+          description: The group
+          required: true
           schema:
             type: string
+      requestBody:
+        description: The bookie info
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/BookieInfo'
+        required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
+      x-codegen-request-body-name: body
     delete:
       tags:
         - bookies
@@ -110,6 +124,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -140,6 +157,7 @@ paths:
       tags:
         - broker-stats
       summary: Get pending bookie client op stats by namespace
+      description: 'Returns a nested map structure which Swagger does not fully support for display. Structure: Map<String, Map<String, PendingBookieOpsStats>>. Please refer to this structure for details.'
       operationId: BrokerStatsBase_getPendingBookieOpsStats
       responses:
         "200":
@@ -173,7 +191,7 @@ paths:
             type: string
       responses:
         "200":
-          description: successful operation
+          description: Returns broker resource availability as Map<Long, List<ResourceUnit>>.Since `ResourceUnit` is an interface, its specific content is not determinable via class reflection. Refer to the source code or interface tests for detailed type definitions.
           content:
             application/json:
               schema:
@@ -260,7 +278,7 @@ paths:
     get:
       tags:
         - brokers
-      summary: Get the list of active brokers (web service addresses) in the local cluster.If authorization is not enabled
+      summary: Get the list of active brokers (broker ids) in the local cluster.If authorization is not enabled
       operationId: BrokersBase_getActiveBrokers
       responses:
         "200":
@@ -285,7 +303,7 @@ paths:
       summary: An REST endpoint to trigger backlogQuotaCheck
       operationId: BrokersBase_backlogQuotaCheck
       responses:
-        "200":
+        "204":
           description: Everything is OK
           content: {}
         "403":
@@ -301,6 +319,14 @@ paths:
       summary: Get all updatable dynamic configurations's name
       operationId: BrokersBase_getDynamicConfigurationName
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
         "403":
           description: You don't have admin permission to get configuration
           content: {}
@@ -311,6 +337,14 @@ paths:
       summary: Get all runtime configurations. This operation requires Pulsar super-user privileges.
       operationId: BrokersBase_getRuntimeConfiguration
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
         "403":
           description: Don't have admin permission
           content: {}
@@ -321,6 +355,14 @@ paths:
       summary: Get value of all dynamic configurations' value overridden on local config
       operationId: BrokersBase_getAllDynamicConfigurations
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
         "403":
           description: You don't have admin permission to view configuration
           content: {}
@@ -344,7 +386,7 @@ paths:
             type: string
       responses:
         "204":
-          description: Service configuration updated successfully
+          description: Service configuration delete successfully
           content: {}
         "403":
           description: You don't have admin permission to update service-configuration
@@ -397,6 +439,7 @@ paths:
       parameters:
         - name: topicVersion
           in: query
+          description: Topic Version
           schema:
             type: string
             enum:
@@ -502,7 +545,7 @@ paths:
       operationId: BrokersBase_version
       responses:
         "200":
-          description: Everything is OK
+          description: The Pulsar version
           content:
             application/json:
               schema:
@@ -510,11 +553,11 @@ paths:
         "500":
           description: Internal server error
           content: {}
-  /brokers/{clusterName}/{broker-webserviceurl}/ownedNamespaces:
+  /brokers/{clusterName}/{brokerId}/ownedNamespaces:
     get:
       tags:
         - brokers
-      summary: Get the list of namespaces served by the specific broker
+      summary: Get the list of namespaces served by the specific broker id
       operationId: BrokersBase_getOwnedNamespaces
       parameters:
         - name: clusterName
@@ -522,7 +565,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: broker-webserviceurl
+        - name: brokerId
           in: path
           required: true
           schema:
@@ -549,7 +592,7 @@ paths:
     get:
       tags:
         - brokers
-      summary: Get the list of active brokers (web service addresses) in the cluster.If authorization is not enabled, any cluster name is valid.
+      summary: Get the list of active brokers (broker ids) in the cluster.If authorization is not enabled, any cluster name is valid.
       operationId: BrokersBase_getActiveBrokersByCluster
       parameters:
         - name: cluster
@@ -649,7 +692,7 @@ paths:
               $ref: '#/components/schemas/ClusterData'
         required: true
       responses:
-        "204":
+        "200":
           description: Cluster has been created.
           content: {}
         "400":
@@ -689,7 +732,7 @@ paths:
               $ref: '#/components/schemas/ClusterData'
         required: true
       responses:
-        "204":
+        "200":
           description: Cluster has been updated.
           content: {}
         "400":
@@ -829,6 +872,9 @@ paths:
               $ref: '#/components/schemas/FailureDomain'
         required: true
       responses:
+        "204":
+          description: Set the failure domain of the cluster successfully.
+          content: {}
         "403":
           description: Don't have admin permission.
           content: {}
@@ -865,6 +911,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Delete the failure domain of the cluster successfully
+          content: {}
         "403":
           description: Don't have admin permission or policy is read only
           content: {}
@@ -905,7 +954,7 @@ paths:
               $ref: '#/components/schemas/ClusterUrl'
         required: true
       responses:
-        "204":
+        "200":
           description: Cluster has been updated.
           content: {}
         "400":
@@ -1095,6 +1144,9 @@ paths:
               $ref: '#/components/schemas/NamespaceIsolationData'
         required: true
       responses:
+        "204":
+          description: Set namespace isolation policy successfully.
+          content: {}
         "400":
           description: Namespace isolation policy data is invalid.
           content: {}
@@ -1131,6 +1183,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Delete namespace isolation policy successfully.
+          content: {}
         "403":
           description: Don't have admin permission or policies are read only.
           content: {}
@@ -1274,7 +1329,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookieAffinityGroupData'
+                $ref: '#/components/schemas/BookieAffinityGroupDataImpl'
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -1304,6 +1359,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1395,6 +1453,9 @@ paths:
               $ref: '#/components/schemas/Policies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1435,6 +1496,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -1450,6 +1514,83 @@ paths:
         "409":
           description: Namespace is not empty
           content: {}
+  /namespaces/{tenant}/{namespace}/allowedClusters:
+    get:
+      tags:
+        - namespaces
+      summary: Get the allowed clusters for a namespace.
+      operationId: Namespaces_getNamespaceAllowedClusters
+      parameters:
+        - name: tenant
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "403":
+          description: Don't have admin permission
+          content: {}
+        "404":
+          description: Tenant or cluster or namespace doesn't exist
+          content: {}
+        "412":
+          description: Namespace is not global
+          content: {}
+    post:
+      tags:
+        - namespaces
+      summary: Set the allowed clusters for a namespace.
+      operationId: Namespaces_setNamespaceAllowedClusters
+      parameters:
+        - name: tenant
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: namespace
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: List of allowed clusters
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        "400":
+          description: The list of allowed clusters should include all replication clusters.
+          content: {}
+        "403":
+          description: The requester does not have admin permissions.
+          content: {}
+        "404":
+          description: The specified tenant, cluster, or namespace does not exist.
+          content: {}
+        "409":
+          description: A peer-cluster cannot be part of an allowed-cluster.
+          content: {}
+        "412":
+          description: The namespace is not global or the provided cluster IDs are invalid.
+          content: {}
+      x-codegen-request-body-name: body
   /namespaces/{tenant}/{namespace}/antiAffinity:
     get:
       tags:
@@ -1504,6 +1645,9 @@ paths:
               type: string
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1531,6 +1675,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1558,6 +1705,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoSubscriptionCreationOverrideImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -1588,6 +1741,9 @@ paths:
               $ref: '#/components/schemas/AutoSubscriptionCreationOverride'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid autoSubscriptionCreation override
           content: {}
@@ -1615,6 +1771,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1639,6 +1798,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoTopicCreationOverrideImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -1669,6 +1834,9 @@ paths:
               $ref: '#/components/schemas/AutoTopicCreationOverride'
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid autoTopicCreation override
           content: {}
@@ -1699,6 +1867,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1737,6 +1908,9 @@ paths:
               $ref: '#/components/schemas/BacklogQuota'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1774,6 +1948,9 @@ paths:
               - destination_storage
               - message_age
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1801,6 +1978,14 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/BacklogQuotaImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -1825,6 +2010,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BundlesDataImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -1857,6 +2048,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin or operate permission on the namespace
           content: {}
@@ -1891,6 +2085,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin or operate permission on the namespace
           content: {}
@@ -1916,6 +2113,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
         "403":
           description: Don't have admin permission
           content: {}
@@ -1948,6 +2152,9 @@ paths:
               format: int64
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -1979,6 +2186,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2006,6 +2216,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: boolean
         "403":
           description: Don't have admin permission
           content: {}
@@ -2036,6 +2252,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2060,6 +2279,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2084,6 +2306,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -2115,6 +2344,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2140,6 +2372,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DelayedDeliveryPolicies'
         "403":
           description: Don't have admin permission
           content: {}
@@ -2173,6 +2411,9 @@ paths:
               $ref: '#/components/schemas/DelayedDeliveryPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2197,6 +2438,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2221,6 +2465,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatchRate'
         "403":
           description: Don't have admin permission
           content: {}
@@ -2251,6 +2501,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2272,6 +2525,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2293,6 +2549,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: boolean
         "403":
           description: Don't have admin permission
           content: {}
@@ -2323,6 +2585,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2351,6 +2616,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryFilters'
         "403":
           description: Don't have admin permission
           content: {}
@@ -2381,6 +2652,9 @@ paths:
               $ref: '#/components/schemas/EntryFilters'
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Specified entry filters are not valid
           content: {}
@@ -2408,6 +2682,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2435,6 +2712,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InactiveTopicPolicies'
         "403":
           description: Don't have admin permission
           content: {}
@@ -2468,6 +2751,9 @@ paths:
               $ref: '#/components/schemas/InactiveTopicPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2492,6 +2778,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2519,6 +2808,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: boolean
         "403":
           description: Don't have admin permission
           content: {}
@@ -2552,6 +2847,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2580,6 +2878,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -2611,6 +2916,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2641,6 +2949,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2671,6 +2982,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -2702,6 +3020,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2732,6 +3053,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2759,6 +3083,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -2790,6 +3121,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2820,6 +3154,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2847,6 +3184,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -2878,6 +3222,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2908,6 +3255,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2935,6 +3285,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -2966,6 +3323,9 @@ paths:
               format: int32
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -2990,6 +3350,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3014,6 +3377,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -3045,6 +3415,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3075,6 +3448,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3099,6 +3475,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -3130,6 +3513,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3160,6 +3546,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3222,6 +3611,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3249,6 +3641,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3277,6 +3672,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
         "403":
           description: Don't have admin permission
           content: {}
@@ -3309,6 +3711,9 @@ paths:
               format: int64
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3339,6 +3744,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3366,6 +3774,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffloadPolicies'
         "403":
           description: Don't have admin permission
           content: {}
@@ -3375,7 +3789,7 @@ paths:
     post:
       tags:
         - namespaces
-      summary: ' Set offload configuration on a namespace.'
+      summary: Set offload configuration on a namespace.
       operationId: Namespaces_setOffloadPolicies
       parameters:
         - name: tenant
@@ -3396,6 +3810,9 @@ paths:
               $ref: '#/components/schemas/OffloadPoliciesImpl'
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3428,6 +3845,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
         "403":
           description: Don't have admin permission
           content: {}
@@ -3460,6 +3884,9 @@ paths:
               format: int64
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3492,6 +3919,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
         "403":
           description: Don't have admin permission
           content: {}
@@ -3516,6 +3950,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3533,6 +3970,7 @@ paths:
       tags:
         - namespaces
       summary: Retrieve the permissions for a namespace.
+      description: 'Returns a nested map structure which Swagger does not fully support for display. Structure: Map<String, Set<AuthAction>>. Please refer to this structure for details.'
       operationId: Namespaces_getPermissions
       parameters:
         - name: tenant
@@ -3546,6 +3984,21 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                  enum:
+                    - produce
+                    - consume
+                    - functions
+                    - sources
+                    - sinks
+                    - packages
         "403":
           description: Don't have admin permission
           content: {}
@@ -3560,6 +4013,7 @@ paths:
       tags:
         - namespaces
       summary: Retrieve the permissions for a subscription.
+      description: 'Returns a nested map structure which Swagger does not fully support for display. Structure: Map<String, Set<String>>. Please refer to this structure for details.'
       operationId: Namespaces_getPermissionOnSubscription
       parameters:
         - name: tenant
@@ -3573,6 +4027,14 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
         "403":
           description: Don't have admin permission
           content: {}
@@ -3621,6 +4083,9 @@ paths:
                   - packages
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3656,6 +4121,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3680,6 +4148,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersistencePolicies'
         "403":
           description: Don't have admin permission
           content: {}
@@ -3713,6 +4187,9 @@ paths:
               $ref: '#/components/schemas/PersistencePolicies'
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid persistence policies
           content: {}
@@ -3743,6 +4220,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3771,6 +4251,9 @@ paths:
               $ref: '#/components/schemas/BookieAffinityGroupData'
         required: false
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -3802,6 +4285,14 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
         "403":
           description: Don't have admin permission
           content: {}
@@ -3834,6 +4325,9 @@ paths:
                 type: string
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3858,6 +4352,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3887,6 +4384,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
         "403":
           description: Don't have admin permission
           content: {}
@@ -3915,6 +4418,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3949,6 +4455,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -3973,6 +4482,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4008,6 +4520,7 @@ paths:
           content:
             application/json:
               schema:
+                uniqueItems: true
                 type: array
                 items:
                   type: string
@@ -4046,6 +4559,9 @@ paths:
                 type: string
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4077,6 +4593,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatchRateImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -4107,6 +4629,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4128,6 +4653,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4149,6 +4677,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
         "403":
           description: Don't have admin permission
           content: {}
@@ -4172,6 +4706,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4204,6 +4741,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4231,6 +4771,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetentionPolicies'
         "403":
           description: Don't have admin permission
           content: {}
@@ -4261,6 +4807,9 @@ paths:
               $ref: '#/components/schemas/RetentionPolicies'
         required: false
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4298,6 +4847,9 @@ paths:
               $ref: '#/components/schemas/RetentionPolicies'
         required: false
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4329,6 +4881,9 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: Successful get of offloaded ledger data
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4403,6 +4958,9 @@ paths:
               type: string
         required: false
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4431,6 +4989,22 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - UNDEFINED
+                  - ALWAYS_INCOMPATIBLE
+                  - ALWAYS_COMPATIBLE
+                  - BACKWARD
+                  - FORWARD
+                  - FULL
+                  - BACKWARD_TRANSITIVE
+                  - FORWARD_TRANSITIVE
+                  - FULL_TRANSITIVE
         "403":
           description: Don't have admin permission
           content: {}
@@ -4464,6 +5038,9 @@ paths:
               type: string
         required: false
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4498,6 +5075,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: boolean
         "403":
           description: Don't have admin permission
           content: {}
@@ -4529,6 +5112,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4557,6 +5143,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscribeRate'
         "403":
           description: Don't have admin permission
           content: {}
@@ -4587,6 +5179,9 @@ paths:
               $ref: '#/components/schemas/SubscribeRate'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4608,6 +5203,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4629,6 +5227,15 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - None
+                  - Prefix
         "403":
           description: Don't have admin permission
           content: {}
@@ -4659,6 +5266,9 @@ paths:
               type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4687,6 +5297,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatchRate'
         "403":
           description: Don't have admin permission
           content: {}
@@ -4717,6 +5333,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4738,6 +5357,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4759,6 +5381,13 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
         "403":
           description: Don't have admin permission
           content: {}
@@ -4790,6 +5419,9 @@ paths:
               format: int32
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4817,6 +5449,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4841,6 +5476,20 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - Exclusive
+                    - Shared
+                    - Failover
+                    - Key_Shared
         "403":
           description: Don't have admin permission
           content: {}
@@ -4881,6 +5530,9 @@ paths:
                   - Key_Shared
         required: true
       responses:
+        "200":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -4983,6 +5635,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -5023,6 +5678,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin or operate permission on the namespacen
           content: {}
@@ -5062,6 +5720,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -5102,6 +5763,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -5144,6 +5808,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -5200,6 +5867,9 @@ paths:
                 format: int64
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -5241,6 +5911,12 @@ paths:
             items:
               type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopicHashPositions'
         "403":
           description: Don't have admin permission
           content: {}
@@ -5279,6 +5955,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -5321,6 +6000,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin or operate permission on the namespace
           content: {}
@@ -5525,6 +6207,9 @@ paths:
                 type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -5588,6 +6273,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -5646,6 +6334,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -5708,6 +6399,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoSubscriptionCreationOverrideImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -5759,6 +6456,9 @@ paths:
               $ref: '#/components/schemas/AutoSubscriptionCreationOverrideImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -5805,6 +6505,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -5912,6 +6615,9 @@ paths:
               $ref: '#/components/schemas/BacklogQuotaImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -5968,6 +6674,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6122,6 +6831,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LongRunningProcessStatus'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -6177,6 +6892,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -6303,6 +7021,9 @@ paths:
               format: int64
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6349,6 +7070,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6387,6 +7111,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -6502,6 +7229,9 @@ paths:
               type: boolean
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6545,6 +7275,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6648,6 +7381,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6688,6 +7424,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6788,6 +7527,9 @@ paths:
               $ref: '#/components/schemas/DelayedDeliveryPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6828,6 +7570,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6873,6 +7618,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatchRateImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -6925,6 +7676,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -6971,6 +7725,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7025,6 +7782,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryFilters'
         "403":
           description: Don't have admin permission
           content: {}
@@ -7071,6 +7834,9 @@ paths:
               $ref: '#/components/schemas/EntryFilters'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7117,6 +7883,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7177,6 +7946,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Successfully retrieved the message. The response is a binary byte stream containing the message data. Clients need to parse this binary stream based on the message metadata provided in the response headers.
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -7289,6 +8061,9 @@ paths:
               $ref: '#/components/schemas/InactiveTopicPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7329,6 +8104,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7428,6 +8206,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersistentTopicInternalStats'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -7478,6 +8262,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageIdAdv'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -7548,6 +8338,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Successfully retrieved the message. The response is a binary byte stream containing the message data. Clients need to parse this binary stream based on the message metadata provided in the response headers.
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -7671,6 +8464,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7720,6 +8516,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7826,6 +8625,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7872,6 +8674,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -7978,6 +8783,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8027,6 +8835,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8138,6 +8949,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8187,6 +9001,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8293,6 +9110,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8342,6 +9162,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8450,6 +9273,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8490,6 +9316,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8592,6 +9421,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8632,6 +9464,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -8733,6 +9568,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Not authenticate to perform the request or policy is read only
           content: {}
@@ -8778,6 +9616,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Not authenticate to perform the request or policy is read only
           content: {}
@@ -8829,6 +9670,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageIdAdv'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -8885,6 +9732,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffloadProcessStatus'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -8940,6 +9793,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -9009,6 +9865,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffloadPoliciesImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -9058,6 +9920,9 @@ paths:
               $ref: '#/components/schemas/OffloadPoliciesImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -9098,6 +9963,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -9284,6 +10152,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartitionedTopicMetadata'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -9345,6 +10219,9 @@ paths:
               default: 0
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -9487,6 +10364,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -9513,7 +10393,7 @@ paths:
       tags:
         - non-persistent topic
       summary: Get permissions on a topic.
-      description: Retrieve the effective permissions for a topic. These permissions are defined by the permissions set at thenamespace level combined (union) with any eventual specific permission set on the topic.
+      description: 'Retrieve the effective permissions for a topic. These permissions are defined by the permissions set at thenamespace level combined (union) with any eventual specific permission set on the topic.Returns a nested map structure which Swagger does not fully support for display. Structure: Map<String, Set<AuthAction>>. Please refer to this structure for details.'
       operationId: NonPersistentTopics_getPermissionsOnTopic
       parameters:
         - name: tenant
@@ -9535,6 +10415,21 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                  enum:
+                    - produce
+                    - consume
+                    - functions
+                    - sources
+                    - sinks
+                    - packages
         "401":
           description: Don't have permission to administrate resources on this tenant
           content: {}
@@ -9598,6 +10493,9 @@ paths:
                   - packages
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -9652,6 +10550,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -9767,6 +10668,9 @@ paths:
               $ref: '#/components/schemas/PersistencePolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid persistence policies
           content: {}
@@ -9816,6 +10720,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -9929,6 +10836,9 @@ paths:
                 type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -9985,6 +10895,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -10098,6 +11011,9 @@ paths:
               $ref: '#/components/schemas/PublishRate'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10144,6 +11060,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10244,6 +11163,9 @@ paths:
                 type: string
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10295,6 +11217,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10404,6 +11329,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10453,6 +11381,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10562,6 +11493,9 @@ paths:
               $ref: '#/components/schemas/RetentionPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10611,6 +11545,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10729,6 +11666,9 @@ paths:
               type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -10780,6 +11720,9 @@ paths:
               type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -10830,6 +11773,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: boolean
         "403":
           description: Don't have admin permission
           content: {}
@@ -10873,6 +11822,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10912,6 +11864,14 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
         "403":
           description: Don't have admin permission
           content: {}
@@ -10958,6 +11918,9 @@ paths:
                 type: string
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -10999,6 +11962,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -11185,6 +12151,9 @@ paths:
               $ref: '#/components/schemas/SubscribeRate'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -11238,6 +12207,9 @@ paths:
               $ref: '#/components/schemas/SubscribeRate'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -11296,6 +12268,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11362,6 +12337,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11429,6 +12407,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11497,6 +12478,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11564,6 +12548,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Successfully retrieved the message. The response is a binary byte stream containing the message data. Clients need to parse this binary stream based on the message metadata provided in the response headers.
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11626,6 +12613,14 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11693,6 +12688,9 @@ paths:
                 type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11820,6 +12818,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11891,6 +12892,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -11962,6 +12966,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -12032,6 +13039,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -12092,6 +13102,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -12167,6 +13180,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -12289,6 +13305,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -12335,6 +13354,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -12453,6 +13475,9 @@ paths:
                   - Key_Shared
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -12499,6 +13524,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -12604,6 +13632,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Operation terminated successfully. The response includes the 'lastMessageId', which is the identifier of the last message processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageIdAdv'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -12663,6 +13697,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "401":
           description: Don't have permission to administrate resources on this tenant orsubscriber is not authorized to access this operation
           content: {}
@@ -12716,6 +13753,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -12773,6 +13813,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "412":
           description: NonPersistentTopic does not support truncate.
           content: {}
@@ -12808,6 +13851,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -12873,6 +13919,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatchRate'
         "403":
           description: Don't have admin permission
           content: {}
@@ -12930,6 +13982,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -12981,6 +14036,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -13136,6 +14194,9 @@ paths:
                 type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -13199,6 +14260,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -13257,6 +14321,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -13319,6 +14386,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoSubscriptionCreationOverrideImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -13370,6 +14443,9 @@ paths:
               $ref: '#/components/schemas/AutoSubscriptionCreationOverrideImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -13416,6 +14492,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -13523,6 +14602,9 @@ paths:
               $ref: '#/components/schemas/BacklogQuotaImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -13579,6 +14661,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -13733,6 +14818,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LongRunningProcessStatus'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -13788,6 +14879,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -13914,6 +15008,9 @@ paths:
               format: int64
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -13960,6 +15057,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -13998,6 +15098,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -14113,6 +15216,9 @@ paths:
               type: boolean
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14156,6 +15262,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14259,6 +15368,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14299,6 +15411,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14399,6 +15514,9 @@ paths:
               $ref: '#/components/schemas/DelayedDeliveryPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14439,6 +15557,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14484,6 +15605,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatchRateImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -14536,6 +15663,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14582,6 +15712,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14636,6 +15769,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntryFilters'
         "403":
           description: Don't have admin permission
           content: {}
@@ -14682,6 +15821,9 @@ paths:
               $ref: '#/components/schemas/EntryFilters'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14728,6 +15870,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14788,6 +15933,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Successfully retrieved the message. The response is a binary byte stream containing the message data. Clients need to parse this binary stream based on the message metadata provided in the response headers.
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -14900,6 +16048,9 @@ paths:
               $ref: '#/components/schemas/InactiveTopicPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -14940,6 +16091,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15098,6 +16252,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageIdAdv'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -15168,6 +16328,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Successfully retrieved the message. The response is a binary byte stream containing the message data. Clients need to parse this binary stream based on the message metadata provided in the response headers.
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -15291,6 +16454,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15340,6 +16506,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15446,6 +16615,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15492,6 +16664,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15598,6 +16773,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15647,6 +16825,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15758,6 +16939,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15807,6 +16991,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15913,6 +17100,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -15962,6 +17152,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -16070,6 +17263,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -16110,6 +17306,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -16212,6 +17411,9 @@ paths:
               format: int32
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -16252,6 +17454,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -16353,6 +17558,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Not authenticate to perform the request or policy is read only
           content: {}
@@ -16398,6 +17606,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Not authenticate to perform the request or policy is read only
           content: {}
@@ -16449,6 +17660,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageIdAdv'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -16505,6 +17722,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffloadProcessStatus'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -16560,6 +17783,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -16629,6 +17855,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffloadPoliciesImpl'
         "403":
           description: Don't have admin permission
           content: {}
@@ -16678,6 +17910,9 @@ paths:
               $ref: '#/components/schemas/OffloadPoliciesImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -16718,6 +17953,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -16971,6 +18209,9 @@ paths:
               default: 0
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -17113,6 +18354,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -17139,7 +18383,7 @@ paths:
       tags:
         - persistent topic
       summary: Get permissions on a topic.
-      description: Retrieve the effective permissions for a topic. These permissions are defined by the permissions set at thenamespace level combined (union) with any eventual specific permission set on the topic.
+      description: 'Retrieve the effective permissions for a topic. These permissions are defined by the permissions set at thenamespace level combined (union) with any eventual specific permission set on the topic.Returns a nested map structure which Swagger does not fully support for display. Structure: Map<String, Set<AuthAction>>. Please refer to this structure for details.'
       operationId: PersistentTopics_getPermissionsOnTopic
       parameters:
         - name: tenant
@@ -17161,6 +18405,21 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                  enum:
+                    - produce
+                    - consume
+                    - functions
+                    - sources
+                    - sinks
+                    - packages
         "401":
           description: Don't have permission to administrate resources on this tenant
           content: {}
@@ -17224,6 +18483,9 @@ paths:
                   - packages
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -17278,6 +18540,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -17393,6 +18658,9 @@ paths:
               $ref: '#/components/schemas/PersistencePolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid persistence policies
           content: {}
@@ -17442,6 +18710,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -17555,6 +18826,9 @@ paths:
                 type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -17611,6 +18885,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -17724,6 +19001,9 @@ paths:
               $ref: '#/components/schemas/PublishRate'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -17770,6 +19050,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -17870,6 +19153,9 @@ paths:
                 type: string
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -17921,6 +19207,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18030,6 +19319,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18079,6 +19371,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18188,6 +19483,9 @@ paths:
               $ref: '#/components/schemas/RetentionPolicies'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18237,6 +19535,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18355,6 +19656,9 @@ paths:
               type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -18406,6 +19710,9 @@ paths:
               type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -18456,6 +19763,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: boolean
         "403":
           description: Don't have admin permission
           content: {}
@@ -18499,6 +19812,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18538,6 +19854,14 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
         "403":
           description: Don't have admin permission
           content: {}
@@ -18584,6 +19908,9 @@ paths:
                 type: string
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18625,6 +19952,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18811,6 +20141,9 @@ paths:
               $ref: '#/components/schemas/SubscribeRate'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18864,6 +20197,9 @@ paths:
               $ref: '#/components/schemas/SubscribeRate'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -18922,6 +20258,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -18988,6 +20327,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19055,6 +20397,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19123,6 +20468,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19190,6 +20538,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Successfully retrieved the message. The response is a binary byte stream containing the message data. Clients need to parse this binary stream based on the message metadata provided in the response headers.
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19252,6 +20603,14 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19319,6 +20678,9 @@ paths:
                 type: string
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19446,6 +20808,9 @@ paths:
               type: boolean
         required: true
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19517,6 +20882,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19588,6 +20956,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19658,6 +21029,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19718,6 +21092,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19793,6 +21170,9 @@ paths:
               $ref: '#/components/schemas/ResetCursorData'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -19915,6 +21295,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -19961,6 +21344,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -20079,6 +21465,9 @@ paths:
                   - Key_Shared
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -20125,6 +21514,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -20230,6 +21622,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: Operation terminated successfully. The response includes the 'lastMessageId', which is the identifier of the last message processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageIdAdv'
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -20289,6 +21687,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "401":
           description: Don't have permission to administrate resources on this tenant orsubscriber is not authorized to access this operation
           content: {}
@@ -20342,6 +21743,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -20399,6 +21803,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace of this topic
           content: {}
@@ -20446,6 +21853,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "401":
           description: Don't have permission to administrate resources on this tenant
           content: {}
@@ -20511,6 +21921,12 @@ paths:
             type: boolean
             default: false
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatchRate'
         "403":
           description: Don't have admin permission
           content: {}
@@ -20568,6 +21984,9 @@ paths:
               $ref: '#/components/schemas/DispatchRateImpl'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -20619,6 +22038,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -20702,6 +22124,12 @@ paths:
           schema:
             type: string
       responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceQuota'
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -20743,6 +22171,9 @@ paths:
               $ref: '#/components/schemas/ResourceQuota'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -20778,6 +22209,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "307":
           description: Current broker doesn't serve the namespace
           content: {}
@@ -20850,6 +22284,9 @@ paths:
               $ref: '#/components/schemas/ResourceGroup'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -20869,6 +22306,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: Don't have admin permission
           content: {}
@@ -21351,6 +22791,9 @@ paths:
               $ref: '#/components/schemas/TenantInfo'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: The requester doesn't have admin permissions
           content: {}
@@ -21382,6 +22825,9 @@ paths:
               $ref: '#/components/schemas/TenantInfo'
         required: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: The requester doesn't have admin permissions
           content: {}
@@ -21413,6 +22859,9 @@ paths:
             type: boolean
             default: false
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "403":
           description: The requester doesn't have admin permissions
           content: {}
@@ -21468,6 +22917,7 @@ paths:
   /worker/assignments:
     get:
       summary: Fetches information about which Pulsar Functions are assigned to which Pulsar clusters
+      description: 'Returns a nested map structure which Swagger does not fully support for display.Structure: Map<String, Set<String>>. Please refer to this structure for details.'
       operationId: Worker_getAssignments
       responses:
         "200":
@@ -21547,8 +22997,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties: {}
+                  $ref: '#/components/schemas/ConnectorDefinition'
         "400":
           description: Invalid request
           content: {}
@@ -21579,6 +23028,9 @@ paths:
       summary: Drains this worker, i.e., moves its work-assignments to other workers
       operationId: Worker_drain
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid request
           content: {}
@@ -21625,6 +23077,9 @@ paths:
           schema:
             type: string
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid request
           content: {}
@@ -21645,6 +23100,9 @@ paths:
       summary: Triggers a rebalance of functions to workers
       operationId: Worker_rebalance
       responses:
+        "204":
+          description: Operation successful
+          content: {}
         "400":
           description: Invalid request
           content: {}
@@ -21777,6 +23235,16 @@ components:
           format: int32
         topicType:
           type: string
+    AutoTopicCreationOverrideImpl:
+      type: object
+      properties:
+        allowAutoTopicCreation:
+          type: boolean
+        defaultNumPartitions:
+          type: integer
+          format: int32
+        topicType:
+          type: string
     BacklogQuota:
       type: object
       properties:
@@ -21813,7 +23281,19 @@ components:
             - producer_request_hold
             - producer_exception
             - consumer_backlog_eviction
+    BitSet:
+      type: object
+      properties:
+        empty:
+          type: boolean
     BookieAffinityGroupData:
+      type: object
+      properties:
+        bookkeeperAffinityGroupPrimary:
+          type: string
+        bookkeeperAffinityGroupSecondary:
+          type: string
+    BookieAffinityGroupDataImpl:
       type: object
       properties:
         bookkeeperAffinityGroupPrimary:
@@ -21837,6 +23317,8 @@ components:
     BrokerInfo:
       type: object
       properties:
+        brokerId:
+          type: string
         serviceUrl:
           type: string
     BrokerNamespaceIsolationData:
@@ -21859,6 +23341,16 @@ components:
           type: boolean
       description: The namespace isolation data for a given broker
     BundlesData:
+      type: object
+      properties:
+        boundaries:
+          type: array
+          items:
+            type: string
+        numBundles:
+          type: integer
+          format: int32
+    BundlesDataImpl:
       type: object
       properties:
         boundaries:
@@ -22596,18 +24088,19 @@ components:
         entries:
           type: integer
           format: int64
+        isOffloaded:
+          type: boolean
         ledgerId:
           type: integer
           format: int64
-        metadata:
+        offloadedContextUuid:
           type: string
-        offloaded:
-          type: boolean
         size:
           type: integer
           format: int64
-        underReplicated:
-          type: boolean
+        timestamp:
+          type: integer
+          format: int64
     LoadReport:
       type: object
       properties:
@@ -22785,6 +24278,30 @@ components:
         percentOfMaxDirectMemory:
           type: number
           format: double
+    MessageId:
+      type: object
+    MessageIdAdv:
+      type: object
+      properties:
+        ackSet:
+          $ref: '#/components/schemas/BitSet'
+        batchIndex:
+          type: integer
+          format: int32
+        batchSize:
+          type: integer
+          format: int32
+        entryId:
+          type: integer
+          format: int64
+        firstChunkMessageId:
+          $ref: '#/components/schemas/MessageIdAdv'
+        ledgerId:
+          type: integer
+          format: int64
+        partitionIndex:
+          type: integer
+          format: int32
     MessageRangeInfo:
       type: object
       properties:
@@ -22851,6 +24368,14 @@ components:
           description: The list of secondary brokers for serving the list of namespaces in this isolation policy
           items:
             type: string
+        unload_scope:
+          type: string
+          description: The type of unload to perform while applying the new isolation policy.
+          example: '''all_matching'' (default) for unloading all matching namespaces. ''none'' for not unloading any namespace. ''changed'' for unloading only the namespaces whose placement is actually changing'
+          enum:
+            - all_matching
+            - none
+            - changed
       description: The data of namespace isolation configuration
     NamespaceOwnershipStatus:
       type: object
@@ -22874,6 +24399,12 @@ components:
         averageMsgSize:
           type: number
           format: double
+        backlogQuotaLimitSize:
+          type: integer
+          format: int64
+        backlogQuotaLimitTime:
+          type: integer
+          format: int64
         backlogSize:
           type: integer
           format: int64
@@ -22939,6 +24470,11 @@ components:
         offloadedStorageSize:
           type: integer
           format: int64
+        oldestBacklogMessageAgeSeconds:
+          type: integer
+          format: int64
+        oldestBacklogMessageSubscriptionName:
+          type: string
         ongoingTxnCount:
           type: integer
           format: int64
@@ -23132,6 +24668,9 @@ components:
         msgDropRate:
           type: number
           format: double
+        msgInReplay:
+          type: integer
+          format: int64
         msgOutCounter:
           type: integer
           format: int64
@@ -23176,6 +24715,12 @@ components:
         averageMsgSize:
           type: number
           format: double
+        backlogQuotaLimitSize:
+          type: integer
+          format: int64
+        backlogQuotaLimitTime:
+          type: integer
+          format: int64
         backlogSize:
           type: integer
           format: int64
@@ -23239,6 +24784,11 @@ components:
         offloadedStorageSize:
           type: integer
           format: int64
+        oldestBacklogMessageAgeSeconds:
+          type: integer
+          format: int64
+        oldestBacklogMessageSubscriptionName:
+          type: string
         ongoingTxnCount:
           type: integer
           format: int64
@@ -23369,6 +24919,10 @@ components:
           type: string
         gcsManagedLedgerOffloadServiceAccountKeyFile:
           type: string
+        managedLedgerExtraConfigurations:
+          type: object
+          additionalProperties:
+            type: string
         managedLedgerOffloadBucket:
           type: string
         managedLedgerOffloadDeletionLagInMillis:
@@ -23427,6 +24981,20 @@ components:
           type: string
         s3ManagedLedgerOffloadServiceEndpoint:
           type: string
+    OffloadProcessStatus:
+      type: object
+      properties:
+        firstUnoffloadedMessage:
+          $ref: '#/components/schemas/MessageId'
+        lastError:
+          type: string
+        status:
+          type: string
+          enum:
+            - NOT_RUN
+            - RUNNING
+            - SUCCESS
+            - ERROR
     OutputStream:
       type: object
     PartitionedManagedLedgerInfo:
@@ -23487,6 +25055,12 @@ components:
         averageMsgSize:
           type: number
           format: double
+        backlogQuotaLimitSize:
+          type: integer
+          format: int64
+        backlogQuotaLimitTime:
+          type: integer
+          format: int64
         backlogSize:
           type: integer
           format: int64
@@ -23549,6 +25123,11 @@ components:
         offloadedStorageSize:
           type: integer
           format: int64
+        oldestBacklogMessageAgeSeconds:
+          type: integer
+          format: int64
+        oldestBacklogMessageSubscriptionName:
+          type: string
         ongoingTxnCount:
           type: integer
           format: int64
@@ -23703,6 +25282,12 @@ components:
         averageMsgSize:
           type: number
           format: double
+        backlogQuotaLimitSize:
+          type: integer
+          format: int64
+        backlogQuotaLimitTime:
+          type: integer
+          format: int64
         backlogSize:
           type: integer
           format: int64
@@ -23751,6 +25336,11 @@ components:
         offloadedStorageSize:
           type: integer
           format: int64
+        oldestBacklogMessageAgeSeconds:
+          type: integer
+          format: int64
+        oldestBacklogMessageSubscriptionName:
+          type: string
         ownerBroker:
           type: string
         publishers:
@@ -23777,6 +25367,11 @@ components:
     Policies:
       type: object
       properties:
+        allowed_clusters:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
         auth_policies:
           $ref: '#/components/schemas/AuthPolicies'
         autoSubscriptionCreationOverride:
@@ -24390,6 +25985,9 @@ components:
         msgDelayed:
           type: integer
           format: int64
+        msgInReplay:
+          type: integer
+          format: int64
         msgOutCounter:
           type: integer
           format: int64
@@ -24461,12 +26059,30 @@ components:
           $ref: '#/components/schemas/MemoryLimit'
         threadGroupName:
           type: string
+    TopicHashPositions:
+      type: object
+      properties:
+        bundle:
+          type: string
+        namespace:
+          type: string
+        topicHashPositions:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
     TopicStats:
       type: object
       properties:
         averageMsgSize:
           type: number
           format: double
+        backlogQuotaLimitSize:
+          type: integer
+          format: int64
+        backlogQuotaLimitTime:
+          type: integer
+          format: int64
         backlogSize:
           type: integer
           format: int64
@@ -24515,6 +26131,11 @@ components:
         offloadedStorageSize:
           type: integer
           format: int64
+        oldestBacklogMessageAgeSeconds:
+          type: integer
+          format: int64
+        oldestBacklogMessageSubscriptionName:
+          type: string
         ownerBroker:
           type: string
         publishers:
@@ -24541,6 +26162,14 @@ components:
     WorkerConfig:
       type: object
       properties:
+        additionalEnabledConnectorUrlPatterns:
+          type: array
+          items:
+            type: string
+        additionalEnabledFunctionsUrlPatterns:
+          type: array
+          items:
+            type: string
         additionalJavaRuntimeArguments:
           type: array
           items:
@@ -24591,6 +26220,14 @@ components:
           type: string
         downloadDirectory:
           type: string
+        enableClassloadingOfBuiltinFiles:
+          type: boolean
+        enableClassloadingOfExternalFiles:
+          type: boolean
+        enableReferencingConnectorDirectoryFiles:
+          type: boolean
+        enableReferencingFunctionsDirectoryFiles:
+          type: boolean
         exposeAdminClientEnabled:
           type: boolean
         failureCheckFreqMs:
@@ -24647,8 +26284,6 @@ components:
         httpServerThreadPoolQueueSize:
           type: integer
           format: int32
-        ignoreUnknownConfigFields:
-          type: boolean
         includeStandardPrometheusMetrics:
           type: boolean
         initialBrokerReconnectMaxRetries:
@@ -24800,6 +26435,10 @@ components:
           type: boolean
         validateConnectorConfig:
           type: boolean
+        webServiceHaProxyProtocolEnabled:
+          type: boolean
+        webServiceLogDetailedAddresses:
+          type: boolean
         webServiceTlsCiphers:
           uniqueItems: true
           type: array
@@ -24810,6 +26449,8 @@ components:
           type: array
           items:
             type: string
+        webServiceTrustXForwardedFor:
+          type: boolean
         workerHostname:
           type: string
         workerId:
@@ -24876,3 +26517,4 @@ components:
       type: object
     WorkersWorkerService:
       type: object
+x-original-swagger-version: "2.0"
